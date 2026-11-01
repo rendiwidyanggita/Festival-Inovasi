@@ -38,15 +38,15 @@ class UpdateRequest extends FormRequest
             $innovation = $this->route('innovation');
             $isRosterLocked = $innovation->awardCategory->isRosterLocked();
 
-            // If roster is locked, prevent changing award_category_id and institution_id
+            // If roster is locked, prevent changing award_category_id and institution_id to different ones
             if ($isRosterLocked) {
-                if ($this->has('award_category_id')) {
+                if ($this->filled('award_category_id') && (int) $this->award_category_id !== (int) $innovation->award_category_id) {
                     $validator->errors()->add(
                         'award_category_id',
                         'Subkategori tidak dapat diubah karena penilaian sudah dimulai.'
                     );
                 }
-                if ($this->has('institution_id')) {
+                if ($this->filled('institution_id') && (int) $this->institution_id !== (int) $innovation->institution_id) {
                     $validator->errors()->add(
                         'institution_id',
                         'Instansi tidak dapat diubah karena penilaian sudah dimulai.'

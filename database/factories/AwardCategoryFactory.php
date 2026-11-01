@@ -21,8 +21,16 @@ class AwardCategoryFactory extends Factory
     public function definition(): array
     {
         return [
-            'festival_id' => Festival::factory(),
             'festival_category_id' => FestivalCategory::factory(),
+            'festival_id' => function (array $attributes) {
+                if (isset($attributes['festival_category_id'])) {
+                    $cat = FestivalCategory::find($attributes['festival_category_id']);
+                    if ($cat) {
+                        return $cat->festival_id;
+                    }
+                }
+                return Festival::factory();
+            },
             'name' => fake()->words(3, true),
             'winner_count' => fake()->numberBetween(1, 5),
             'scoring_status' => ScoringStatus::Preparation,

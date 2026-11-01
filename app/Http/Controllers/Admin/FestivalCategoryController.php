@@ -7,7 +7,9 @@ use App\Http\Requests\FestivalCategory\StoreRequest;
 use App\Http\Requests\FestivalCategory\UpdateRequest;
 use App\Models\FestivalCategory;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\View\View;
+
 
 class FestivalCategoryController extends Controller
 {
@@ -63,12 +65,8 @@ class FestivalCategoryController extends Controller
 
     public function destroy(FestivalCategory $festival_category): RedirectResponse
     {
-        // Check if has award categories
-        if ($festival_category->awardCategories()->exists()) {
-            session()->flash('error', 'Kategori tidak dapat dihapus karena masih memiliki subkategori.');
-
-            return redirect()->route('admin.festival-categories.index');
-        }
+        // Use policy to check authorization (will throw 403 if not allowed)
+        Gate::authorize('delete', $festival_category);
 
         $festival_category->delete();
 

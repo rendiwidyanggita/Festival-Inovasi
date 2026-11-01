@@ -2,13 +2,19 @@
 
 namespace Tests\Feature\Admin;
 
+use App\Enums\AssessmentStatus;
+use App\Enums\AssessmentType;
 use App\Enums\ScoringStatus;
 use App\Models\AssessmentCriterion;
 use App\Models\AwardCategory;
 use App\Models\Festival;
 use App\Models\FestivalCategory;
+use App\Models\FestivalJury;
 use App\Models\Innovation;
+use App\Models\InnovationAssessment;
+use App\Models\InnovationAssessmentDetail;
 use App\Models\Institution;
+use App\Models\JurySubcategoryParticipation;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use PHPUnit\Framework\Attributes\Test;
@@ -304,22 +310,69 @@ class MasterDataCrudTest extends TestCase
     #[Test]
     public function cannot_update_assessment_criterion_with_assessment_details(): void
     {
+        $category = FestivalCategory::factory()->create([
+            'festival_id' => $this->festival->id,
+            'assessment_type' => AssessmentType::Innovation,
+        ]);
+        $awardCategory = AwardCategory::factory()->create([
+            'festival_id' => $this->festival->id,
+            'festival_category_id' => $category->id,
+        ]);
         $criterion = AssessmentCriterion::factory()->create([
             'festival_id' => $this->festival->id,
+            'assessment_type' => AssessmentType::Innovation,
             'name' => 'Original Name',
             'weight' => 30,
         ]);
-        // Simulate existing assessment detail
-        $criterion->innovationAssessmentDetails()->create([
-            'innovation_assessment_id' => 1, // dummy, will fail FK but demonstrates the check
-            'score' => 80,
+        $juryUser = User::factory()->jury()->create();
+        $festivalJury = FestivalJury::create([
+            'festival_id' => $this->festival->id,
+            'user_id' => $juryUser->id,
+            'status' => 'active',
+        ]);
+        $participation = JurySubcategoryParticipation::create([
+            'festival_id' => $this->festival->id,
+            'festival_jury_id' => $festivalJury->id,
+            'award_category_id' => $awardCategory->id,
+            'status' => 'selected',
+            'selected_at' => now(),
+        ]);
+        $institutionCategory = FestivalCategory::factory()->create([
+            'festival_id' => $this->festival->id,
+            'assessment_type' => AssessmentType::Institution,
+        ]);
+        $institutionAwardCategory = AwardCategory::factory()->create([
+            'festival_id' => $this->festival->id,
+            'festival_category_id' => $institutionCategory->id,
+        ]);
+        $institution = Institution::factory()->create([
+            'festival_id' => $this->festival->id,
+            'award_category_id' => $institutionAwardCategory->id,
+        ]);
+        $innovation = Innovation::factory()->create([
+            'festival_id' => $this->festival->id,
+            'award_category_id' => $awardCategory->id,
+            'institution_id' => $institution->id,
+        ]);
+        $assessment = InnovationAssessment::create([
+            'festival_id' => $this->festival->id,
+            'award_category_id' => $awardCategory->id,
+            'jury_subcategory_participation_id' => $participation->id,
+            'innovation_id' => $innovation->id,
+            'status' => AssessmentStatus::Draft,
+        ]);
+        InnovationAssessmentDetail::create([
+            'festival_id' => $this->festival->id,
+            'assessment_type' => 'innovation',
+            'innovation_assessment_id' => $assessment->id,
+            'assessment_criterion_id' => $criterion->id,
+            'score' => 8,
         ]);
 
-        // The policy check happens before the controller, so this will be forbidden
         $response = $this->actingAs($this->superadmin)
             ->put(route('admin.assessment-criteria.update', $criterion), [
                 'name' => 'Updated Name',
-                'assessment_type' => $criterion->assessment_type,
+                'assessment_type' => $criterion->assessment_type->value,
                 'weight' => 40,
                 'sort_order' => 1,
             ]);
@@ -330,13 +383,61 @@ class MasterDataCrudTest extends TestCase
     #[Test]
     public function cannot_delete_assessment_criterion_with_assessment_details(): void
     {
+        $category = FestivalCategory::factory()->create([
+            'festival_id' => $this->festival->id,
+            'assessment_type' => AssessmentType::Innovation,
+        ]);
+        $awardCategory = AwardCategory::factory()->create([
+            'festival_id' => $this->festival->id,
+            'festival_category_id' => $category->id,
+        ]);
         $criterion = AssessmentCriterion::factory()->create([
             'festival_id' => $this->festival->id,
+            'assessment_type' => AssessmentType::Innovation,
         ]);
-        // Simulate existing assessment detail
-        $criterion->innovationAssessmentDetails()->create([
-            'innovation_assessment_id' => 1,
-            'score' => 80,
+        $juryUser = User::factory()->jury()->create();
+        $festivalJury = FestivalJury::create([
+            'festival_id' => $this->festival->id,
+            'user_id' => $juryUser->id,
+            'status' => 'active',
+        ]);
+        $participation = JurySubcategoryParticipation::create([
+            'festival_id' => $this->festival->id,
+            'festival_jury_id' => $festivalJury->id,
+            'award_category_id' => $awardCategory->id,
+            'status' => 'selected',
+            'selected_at' => now(),
+        ]);
+        $institutionCategory = FestivalCategory::factory()->create([
+            'festival_id' => $this->festival->id,
+            'assessment_type' => AssessmentType::Institution,
+        ]);
+        $institutionAwardCategory = AwardCategory::factory()->create([
+            'festival_id' => $this->festival->id,
+            'festival_category_id' => $institutionCategory->id,
+        ]);
+        $institution = Institution::factory()->create([
+            'festival_id' => $this->festival->id,
+            'award_category_id' => $institutionAwardCategory->id,
+        ]);
+        $innovation = Innovation::factory()->create([
+            'festival_id' => $this->festival->id,
+            'award_category_id' => $awardCategory->id,
+            'institution_id' => $institution->id,
+        ]);
+        $assessment = InnovationAssessment::create([
+            'festival_id' => $this->festival->id,
+            'award_category_id' => $awardCategory->id,
+            'jury_subcategory_participation_id' => $participation->id,
+            'innovation_id' => $innovation->id,
+            'status' => AssessmentStatus::Draft,
+        ]);
+        InnovationAssessmentDetail::create([
+            'festival_id' => $this->festival->id,
+            'assessment_type' => 'innovation',
+            'innovation_assessment_id' => $assessment->id,
+            'assessment_criterion_id' => $criterion->id,
+            'score' => 8,
         ]);
 
         $response = $this->actingAs($this->superadmin)
@@ -393,13 +494,31 @@ class MasterDataCrudTest extends TestCase
     public function jury_cannot_access_master_data_crud(): void
     {
         $jury = User::factory()->jury()->create();
-        $category = FestivalCategory::factory()->create(['festival_id' => $this->festival->id]);
+        $category = FestivalCategory::factory()->create([
+            'festival_id' => $this->festival->id,
+            'assessment_type' => AssessmentType::Innovation,
+        ]);
         $awardCategory = AwardCategory::factory()->create([
             'festival_id' => $this->festival->id,
             'festival_category_id' => $category->id,
         ]);
-        $institution = Institution::factory()->create(['festival_id' => $this->festival->id]);
-        $innovation = Innovation::factory()->create(['festival_id' => $this->festival->id]);
+        $institutionCategory = FestivalCategory::factory()->create([
+            'festival_id' => $this->festival->id,
+            'assessment_type' => AssessmentType::Institution,
+        ]);
+        $institutionAwardCategory = AwardCategory::factory()->create([
+            'festival_id' => $this->festival->id,
+            'festival_category_id' => $institutionCategory->id,
+        ]);
+        $institution = Institution::factory()->create([
+            'festival_id' => $this->festival->id,
+            'award_category_id' => $institutionAwardCategory->id,
+        ]);
+        $innovation = Innovation::factory()->create([
+            'festival_id' => $this->festival->id,
+            'award_category_id' => $awardCategory->id,
+            'institution_id' => $institution->id,
+        ]);
         $criterion = AssessmentCriterion::factory()->create(['festival_id' => $this->festival->id]);
 
         // Festival Categories
@@ -410,9 +529,8 @@ class MasterDataCrudTest extends TestCase
 
         // Award Categories
         $this->actingAs($jury)
-            ->get(route('admin.award-categories.index'))
+            ->get(route('admin.festival-categories.award-categories.index', $category))
             ->assertForbidden();
-
         // Institutions
         $this->actingAs($jury)
             ->get(route('admin.institutions.index'))

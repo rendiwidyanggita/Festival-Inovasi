@@ -9,14 +9,15 @@ class UpdateRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        return true;
+        $criterion = $this->route('assessment_criterion') ?? $this->route('criterion');
+
+        return $criterion ? (bool) $this->user()?->can('update', $criterion) : true;
     }
 
     public function rules(): array
     {
-        $criterion = $this->route('criterion');
-        $festivalId = session('selected_festival_id');
-
+        $criterion = $this->route('assessment_criterion') ?? $this->route('criterion');
+        $festivalId = session('selected_festival_id') ?? $criterion?->festival_id;
         return [
             'name' => [
                 'required',
@@ -34,20 +35,7 @@ class UpdateRequest extends FormRequest
 
     public function withValidator($validator): void
     {
-        $validator->after(function ($validator) {
-            $criterion = $this->route('criterion');
-
-            // Check if criterion has any assessment details
-            $hasInnovationDetails = $criterion->innovationAssessmentDetails()->exists();
-            $hasInstitutionDetails = $criterion->institutionAssessmentDetails()->exists();
-
-            if ($hasInnovationDetails || $hasInstitutionDetails) {
-                $validator->errors()->add(
-                    'name',
-                    'Kriteria tidak dapat diubah karena sudah digunakan dalam penilaian.'
-                );
-            }
-        });
+        //
     }
 
     public function messages(): array

@@ -7,6 +7,7 @@ use App\Http\Requests\AssessmentCriterion\StoreRequest;
 use App\Http\Requests\AssessmentCriterion\UpdateRequest;
 use App\Models\AssessmentCriterion;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\View\View;
 
 class AssessmentCriterionController extends Controller
@@ -46,17 +47,20 @@ class AssessmentCriterionController extends Controller
         return redirect()->route('admin.assessment-criteria.index');
     }
 
-    public function edit(AssessmentCriterion $criterion): View
+    public function edit(AssessmentCriterion $assessment_criterion): View
     {
+        $criterion = $assessment_criterion;
         return view('admin.assessment-criteria.edit', compact('criterion'));
     }
 
-    public function update(UpdateRequest $request, AssessmentCriterion $criterion): RedirectResponse
+    public function update(UpdateRequest $request, AssessmentCriterion $assessment_criterion): RedirectResponse
     {
-        $criterion->update([
+        Gate::authorize('update', $assessment_criterion);
+
+        $assessment_criterion->update([
             'name' => $request->name,
             'weight' => $request->weight,
-            'sort_order' => $request->sort_order ?? $criterion->sort_order,
+            'sort_order' => $request->sort_order ?? $assessment_criterion->sort_order,
         ]);
 
         session()->flash('success', 'Kriteria berhasil diperbarui.');
@@ -64,11 +68,13 @@ class AssessmentCriterionController extends Controller
         return redirect()->route('admin.assessment-criteria.index');
     }
 
-    public function destroy(AssessmentCriterion $criterion): RedirectResponse
+    public function destroy(AssessmentCriterion $assessment_criterion): RedirectResponse
     {
+        Gate::authorize('delete', $assessment_criterion);
+
         // Check if criterion has any assessment details
-        $hasInnovationDetails = $criterion->innovationAssessmentDetails()->exists();
-        $hasInstitutionDetails = $criterion->institutionAssessmentDetails()->exists();
+        $hasInnovationDetails = $assessment_criterion->innovationAssessmentDetails()->exists();
+        $hasInstitutionDetails = $assessment_criterion->institutionAssessmentDetails()->exists();
 
         if ($hasInnovationDetails || $hasInstitutionDetails) {
             session()->flash('error', 'Kriteria tidak dapat dihapus karena sudah digunakan dalam penilaian.');
@@ -76,7 +82,7 @@ class AssessmentCriterionController extends Controller
             return redirect()->route('admin.assessment-criteria.index');
         }
 
-        $criterion->delete();
+        $assessment_criterion->delete();
 
         session()->flash('success', 'Kriteria berhasil dihapus.');
 

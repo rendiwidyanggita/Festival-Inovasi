@@ -28,6 +28,14 @@ class AwardCategory extends Model
         return $this->belongsTo(FestivalCategory::class);
     }
 
+    /**
+     * Get assessment type from parent festival category.
+     */
+    public function getAssessmentTypeAttribute(): ?\App\Enums\AssessmentType
+    {
+        return $this->festivalCategory?->assessment_type;
+    }
+
     /** @return BelongsTo<Festival, $this> */
     public function festival(): BelongsTo
     {

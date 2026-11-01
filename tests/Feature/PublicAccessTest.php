@@ -122,9 +122,19 @@ class PublicAccessTest extends TestCase
     #[Test]
     public function guest_cannot_delete_resources(): void
     {
-        $festival = Festival::factory()->create();
+        $category = FestivalCategory::factory()->create([
+            'assessment_type' => AssessmentType::Institution,
+        ]);
+        $awardCategory = AwardCategory::factory()->create([
+            'festival_id' => $category->festival_id,
+            'festival_category_id' => $category->id,
+        ]);
+        $institution = Institution::factory()->create([
+            'festival_id' => $category->festival_id,
+            'award_category_id' => $awardCategory->id,
+        ]);
 
-        $response = $this->delete(route('admin.festivals.destroy', $festival));
+        $response = $this->delete(route('admin.institutions.destroy', $institution));
 
         $response->assertRedirect(route('login'));
     }
@@ -170,8 +180,17 @@ class PublicAccessTest extends TestCase
             'festival_id' => $festival->id,
             'festival_category_id' => $category->id,
         ]);
+        $institutionCategory = FestivalCategory::factory()->create([
+            'festival_id' => $festival->id,
+            'assessment_type' => AssessmentType::Institution,
+        ]);
+        $institutionAwardCategory = AwardCategory::factory()->create([
+            'festival_id' => $festival->id,
+            'festival_category_id' => $institutionCategory->id,
+        ]);
         $institution = Institution::factory()->create([
             'festival_id' => $festival->id,
+            'award_category_id' => $institutionAwardCategory->id,
         ]);
         $innovation = Innovation::factory()->create([
             'festival_id' => $festival->id,

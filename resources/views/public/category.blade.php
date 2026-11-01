@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>{{ $awardCategory->name }} - {{ $festival->name }}</title>
+    <link rel="icon" type="image/svg+xml" href="{{ asset('favicon.svg') }}">
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 <body class="font-sans antialiased bg-gray-50 min-h-screen">
@@ -12,8 +13,12 @@
     <nav class="bg-white shadow-lg">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between h-16">
-                <div class="flex items-center">
+                <div class="flex items-center space-x-4">
                     <a href="{{ route('home') }}" class="text-2xl font-bold text-blue-800">Festival Inovasi</a>
+                    <span class="text-gray-300">/</span>
+                    <a href="{{ route('public.festival', $festival) }}" class="text-gray-600 hover:text-gray-900">
+                        {{ $festival->name }}
+                    </a>
                 </div>
                 <div class="flex items-center space-x-4">
                     <a href="{{ route('login') }}" class="text-blue-600 hover:text-blue-900 font-medium">
@@ -27,29 +32,17 @@
     <!-- Page Header -->
     <header class="bg-white shadow">
         <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
-            <nav class="flex mb-4" aria-label="Breadcrumb">
-                <ol class="flex items-center space-x-4">
-                    <li>
-                        <a href="{{ route('home') }}" class="text-gray-500 hover:text-gray-700">Beranda</a>
-                    </li>
-                    <li>
-                        <span class="text-gray-400">/</span>
-                    </li>
-                    <li>
-                        <a href="{{ route('public.festival', $festival) }}" class="text-gray-500 hover:text-gray-700">{{ $festival->name }}</a>
-                    </li>
-                    <li>
-                        <span class="text-gray-400">/</span>
-                    </li>
-                    <li>
-                        <span class="text-gray-900 font-medium">{{ $awardCategory->name }}</span>
-                    </li>
-                </ol>
-            </nav>
-            <h1 class="text-3xl font-bold text-gray-900">{{ $awardCategory->name }}</h1>
-            <p class="mt-1 text-sm text-gray-500">
-                {{ $awardCategory->festivalCategory->name }} • {{ $awardCategory->assessment_type->label() }}
-            </p>
+            <div class="flex items-center justify-between">
+                <div>
+                    <h1 class="text-3xl font-bold text-gray-900">{{ $awardCategory->name }}</h1>
+                    <p class="mt-1 text-sm text-gray-500">
+                        {{ $awardCategory->festivalCategory->name }} • {{ $awardCategory->festivalCategory->assessment_type->label() }}
+                    </p>
+                </div>
+                <span class="px-3 py-1 text-sm font-semibold rounded-full bg-blue-100 text-blue-800">
+                    {{ $awardCategory->winner_count }} Pemenang
+                </span>
+            </div>
         </div>
     </header>
 
@@ -59,7 +52,7 @@
             <div class="mb-6 bg-yellow-50 border border-yellow-200 rounded-lg p-4">
                 <p class="text-yellow-800">
                     <strong>Penilaian sedang berlangsung.</strong> 
-                    Daftar peserta ditampilkan, namun hasil belum tersedia hingga pengumuman resmi.
+                    Daftar peserta ditampilkan, namun nilai dan peringkat belum tersedia hingga pengumuman resmi.
                 </p>
             </div>
         @endif
@@ -67,12 +60,11 @@
         <!-- Winners Section (if results published) -->
         @if($festival->hasPublishedResults())
             @php
-                $winners = $awardCategory->assessment_type->value === 'innovation' 
-                    ? $awardCategory->innovationWinners 
-                    : $awardCategory->institutionWinners;
+                $isInnovation = $awardCategory->festivalCategory->assessment_type->value === 'innovation';
+                $winners = $isInnovation ? $awardCategory->innovationWinners : $awardCategory->institutionWinners;
             @endphp
             
-            @if($winners->count() > 0)
+            @if($winners && $winners->count() > 0)
                 <div class="bg-white rounded-lg shadow-md p-6 mb-8">
                     <h2 class="text-xl font-semibold text-gray-900 mb-4">Pemenang</h2>
                     <div class="space-y-4">
@@ -83,11 +75,11 @@
                                     {{ $winner->position }}
                                 </div>
                                 <div class="ml-4">
-                                    @if($awardCategory->assessment_type->value === 'innovation')
-                                        <p class="font-semibold text-gray-900">{{ $winner->innovation->name }}</p>
+                                    @if($isInnovation)
+                                        <p class="font-semibold text-gray-900">{{ $winner->innovation->name ?? '-' }}</p>
                                         <p class="text-sm text-gray-600">{{ $winner->innovation->institution->name ?? '-' }}</p>
                                     @else
-                                        <p class="font-semibold text-gray-900">{{ $winner->institution->name }}</p>
+                                        <p class="font-semibold text-gray-900">{{ $winner->institution->name ?? '-' }}</p>
                                     @endif
                                 </div>
                                 <div class="ml-auto text-right">
@@ -104,114 +96,76 @@
         <!-- Participants List -->
         <div class="bg-white rounded-lg shadow-md overflow-hidden">
             <div class="p-6">
-                <h2 class="text-xl font-semibold text-gray-900 mb-4">Daftar Peserta</h2>
+                <h2 class="text-xl font-semibold text-gray-900 mb-4">Daftar Peserta ({{ $participants->count() }})</h2>
                 
-                @if($awardCategory->assessment_type->value === 'innovation')
-                    @php($participants = $awardCategory->innovations)
-                    @if($participants->count() > 0)
-                        <div class="overflow-x-auto">
-                            <table class="min-w-full divide-y divide-gray-200">
-                                <thead class="bg-gray-50">
-                                    <tr>
-                                        @if($festival->hasPublishedResults())
-                                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Peringkat</th>
-                                        @endif
-                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nama Inovasi</th>
+                @if($participants->count() > 0)
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full divide-y divide-gray-200">
+                            <thead class="bg-gray-50">
+                                <tr>
+                                    @if($festival->hasPublishedResults())
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Peringkat</th>
+                                    @endif
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        {{ $awardCategory->festivalCategory->assessment_type->value === 'innovation' ? 'Nama Inovasi' : 'Nama Instansi' }}
+                                    </th>
+                                    @if($awardCategory->festivalCategory->assessment_type->value === 'innovation')
                                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Inovator</th>
                                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Instansi</th>
-                                        @if($festival->hasPublishedResults())
-                                            <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Nilai</th>
-                                        @endif
-                                    </tr>
-                                </thead>
-                                <tbody class="bg-white divide-y divide-gray-200">
-                                    @foreach($participants as $participant)
-                                        <tr>
-                                            @if($festival->hasPublishedResults())
-                                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                                                    @php
-                                                        $winner = $awardCategory->innovationWinners->firstWhere('innovation_id', $participant->id);
-                                                    @endphp
-                                                    @if($winner)
-                                                        <span class="font-semibold">{{ $winner->position }}</span>
-                                                    @else
-                                                        -
-                                                    @endif
-                                                </td>
-                                            @endif
-                                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ $participant->name }}</td>
-                                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ $participant->innovator_name }}</td>
-                                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ $participant->institution->name ?? '-' }}</td>
-                                            @if($festival->hasPublishedResults())
-                                                <td class="px-6 py-4 whitespace-nowrap text-right text-sm text-gray-900">
-                                                    @if($winner)
-                                                        <span class="font-semibold">{{ number_format($winner->total_score, 2) }}</span>
-                                                    @else
-                                                        -
-                                                    @endif
-                                                </td>
-                                            @endif
-                                        </tr>
-                                    @endforeach
-                                </tbody>
-                            </table>
-                        </div>
-                    @else
-                        <div class="text-center py-8">
-                            <p class="text-gray-500">Belum ada inovasi terdaftar pada subkategori ini.</p>
-                        </div>
-                    @endif
-                @else
-                    @php($participants = $awardCategory->institutions)
-                    @if($participants->count() > 0)
-                        <div class="overflow-x-auto">
-                            <table class="min-w-full divide-y divide-gray-200">
-                                <thead class="bg-gray-50">
+                                    @endif
+                                    @if($festival->hasPublishedResults())
+                                        <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Nilai</th>
+                                    @endif
+                                </tr>
+                            </thead>
+                            <tbody class="bg-white divide-y divide-gray-200">
+                                @foreach($participants as $participant)
                                     <tr>
                                         @if($festival->hasPublishedResults())
-                                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Peringkat</th>
+                                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                                @php
+                                                    $winner = $awardCategory->festivalCategory->assessment_type->value === 'innovation'
+                                                        ? $awardCategory->innovationWinners?->firstWhere('innovation_id', $participant->id)
+                                                        : $awardCategory->institutionWinners?->firstWhere('institution_id', $participant->id);
+                                                @endphp
+                                                @if($winner)
+                                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                                                        Juara {{ $winner->position }}
+                                                    </span>
+                                                @else
+                                                    <span class="text-gray-400">-</span>
+                                                @endif
+                                            </td>
                                         @endif
-                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nama Instansi</th>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                                            {{ $participant->name }}
+                                        </td>
+                                        @if($awardCategory->festivalCategory->assessment_type->value === 'innovation')
+                                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                                {{ $participant->innovator_name }}
+                                            </td>
+                                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                                {{ $participant->institution->name ?? '-' }}
+                                            </td>
+                                        @endif
                                         @if($festival->hasPublishedResults())
-                                            <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Nilai</th>
+                                            <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium text-gray-900">
+                                                @if($winner)
+                                                    {{ number_format($winner->total_score, 2) }}
+                                                @else
+                                                    <span class="text-gray-400">-</span>
+                                                @endif
+                                            </td>
                                         @endif
                                     </tr>
-                                </thead>
-                                <tbody class="bg-white divide-y divide-gray-200">
-                                    @foreach($participants as $participant)
-                                        <tr>
-                                            @if($festival->hasPublishedResults())
-                                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                                                    @php
-                                                        $winner = $awardCategory->institutionWinners->firstWhere('institution_id', $participant->id);
-                                                    @endphp
-                                                    @if($winner)
-                                                        <span class="font-semibold">{{ $winner->position }}</span>
-                                                    @else
-                                                        -
-                                                    @endif
-                                                </td>
-                                            @endif
-                                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ $participant->name }}</td>
-                                            @if($festival->hasPublishedResults())
-                                                <td class="px-6 py-4 whitespace-nowrap text-right text-sm text-gray-900">
-                                                    @if($winner)
-                                                        <span class="font-semibold">{{ number_format($winner->total_score, 2) }}</span>
-                                                    @else
-                                                        -
-                                                    @endif
-                                                </td>
-                                            @endif
-                                        </tr>
-                                    @endforeach
-                                </tbody>
-                            </table>
-                        </div>
-                    @else
-                        <div class="text-center py-8">
-                            <p class="text-gray-500">Belum ada instansi terdaftar pada subkategori ini.</p>
-                        </div>
-                    @endif
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
+                @else
+                    <div class="text-center py-8">
+                        <p class="text-gray-500">Belum ada peserta terdaftar pada subkategori ini.</p>
+                    </div>
                 @endif
             </div>
         </div>

@@ -19,7 +19,33 @@ class InstitutionFactory extends Factory
     public function definition(): array
     {
         return [
-            'award_category_id' => AwardCategory::factory(),
+            'award_category_id' => function (array $attributes) {
+                $festivalId = $attributes['festival_id'] ?? null;
+                if ($festivalId) {
+                    $category = \App\Models\FestivalCategory::firstOrCreate([
+                        'festival_id' => $festivalId,
+                        'assessment_type' => \App\Enums\AssessmentType::Institution,
+                    ], [
+                        'name' => 'Kategori Instansi ' . fake()->unique()->word(),
+                    ]);
+
+                    return AwardCategory::factory()->create([
+                        'festival_id' => $festivalId,
+                        'festival_category_id' => $category->id,
+                    ])->id;
+                }
+
+                return AwardCategory::factory();
+            },
+            'festival_id' => function (array $attributes) {
+                if (isset($attributes['award_category_id'])) {
+                    $awardCat = AwardCategory::find($attributes['award_category_id']);
+                    if ($awardCat) {
+                        return $awardCat->festival_id;
+                    }
+                }
+                return \App\Models\Festival::factory();
+            },
             'name' => fake()->company(),
         ];
     }

@@ -8,7 +8,9 @@ use App\Http\Requests\AwardCategory\UpdateRequest;
 use App\Models\AwardCategory;
 use App\Models\FestivalCategory;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\View\View;
+
 
 class AwardCategoryController extends Controller
 {
@@ -66,19 +68,8 @@ class AwardCategoryController extends Controller
 
     public function destroy(AwardCategory $award_category): RedirectResponse
     {
-        // Check if scoring_status is not preparation
-        if ($award_category->scoring_status->value !== 'preparation') {
-            session()->flash('error', 'Subkategori tidak dapat dihapus karena sudah dalam proses penilaian.');
-
-            return redirect()->route('admin.festival-categories.award-categories.index', $award_category->festival_category_id);
-        }
-
-        // Check if has institutions/innovations/participations
-        if ($award_category->institutions()->exists() || $award_category->innovations()->exists() || $award_category->participations()->exists()) {
-            session()->flash('error', 'Subkategori tidak dapat dihapus karena masih memiliki data terkait.');
-
-            return redirect()->route('admin.festival-categories.award-categories.index', $award_category->festival_category_id);
-        }
+        // Use policy to check authorization (will throw 403 if not allowed)
+        Gate::authorize('delete', $award_category);
 
         $festivalCategoryId = $award_category->festival_category_id;
         $award_category->delete();

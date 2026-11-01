@@ -10,6 +10,7 @@ use App\Models\AwardCategory;
 use App\Models\Institution;
 use App\Services\AuditService;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\View\View;
 
 class InnovationController extends Controller
@@ -126,12 +127,8 @@ class InnovationController extends Controller
 
     public function destroy(Innovation $innovation): RedirectResponse
     {
-        // Check if scoring_status is not preparation
-        if ($innovation->awardCategory->isRosterLocked()) {
-            session()->flash('error', 'Inovasi tidak dapat dihapus karena penilaian sudah dimulai.');
-
-            return redirect()->route('admin.innovations.index');
-        }
+        // Use policy to check authorization (will throw 403 if not allowed)
+        Gate::authorize('delete', $innovation);
 
         $innovation->delete();
 

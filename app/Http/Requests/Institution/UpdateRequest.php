@@ -40,8 +40,8 @@ class UpdateRequest extends FormRequest
             $institution = $this->route('institution');
             $isRosterLocked = $institution->awardCategory->isRosterLocked();
 
-            // If roster is locked, prevent changing award_category_id
-            if ($isRosterLocked && $this->has('award_category_id')) {
+            // If roster is locked, prevent changing award_category_id to a different category
+            if ($isRosterLocked && $this->filled('award_category_id') && (int) $this->award_category_id !== (int) $institution->award_category_id) {
                 $validator->errors()->add(
                     'award_category_id',
                     'Subkategori tidak dapat diubah karena penilaian sudah dimulai.'

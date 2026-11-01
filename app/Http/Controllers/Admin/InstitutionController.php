@@ -8,7 +8,9 @@ use App\Http\Requests\Institution\UpdateRequest;
 use App\Models\Institution;
 use App\Services\AuditService;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\View\View;
+
 
 class InstitutionController extends Controller
 {
@@ -101,12 +103,8 @@ class InstitutionController extends Controller
 
     public function destroy(Institution $institution): RedirectResponse
     {
-        // Check if scoring_status is not preparation
-        if ($institution->awardCategory->isRosterLocked()) {
-            session()->flash('error', 'Instansi tidak dapat dihapus karena penilaian sudah dimulai.');
-
-            return redirect()->route('admin.institutions.index');
-        }
+        // Use policy to check authorization (will throw 403 if not allowed)
+        Gate::authorize('delete', $institution);
 
         $institution->delete();
 
