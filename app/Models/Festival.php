@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 
+#[\Illuminate\Database\Eloquent\Attributes\Fillable(['year', 'name', 'status', 'results_published_at', 'results_published_by'])]
 class Festival extends Model
 {
     protected function casts(): array

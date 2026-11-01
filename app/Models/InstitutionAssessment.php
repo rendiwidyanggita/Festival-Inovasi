@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
+#[\Illuminate\Database\Eloquent\Attributes\Fillable(['festival_id', 'award_category_id', 'jury_subcategory_participation_id', 'institution_id', 'status', 'submitted_at', 'locked_at'])]
 class InstitutionAssessment extends Model
 {
     protected function casts(): array

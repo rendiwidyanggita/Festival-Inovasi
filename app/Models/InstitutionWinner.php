@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
+#[\Illuminate\Database\Eloquent\Attributes\Fillable(['festival_id', 'award_category_id', 'institution_id', 'position', 'appointed_by', 'appointed_at', 'notes'])]
 class InstitutionWinner extends Model
 {
     /** @return BelongsTo<Festival, $this> */

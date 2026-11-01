@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
+#[\Illuminate\Database\Eloquent\Attributes\Fillable(['festival_id', 'user_id', 'status'])]
 class FestivalJury extends Model
 {
     protected function casts(): array

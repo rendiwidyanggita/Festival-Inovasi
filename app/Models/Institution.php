@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
+#[\Illuminate\Database\Eloquent\Attributes\Fillable(['festival_id', 'award_category_id', 'name'])]
 class Institution extends Model
 {
     use SoftDeletes;

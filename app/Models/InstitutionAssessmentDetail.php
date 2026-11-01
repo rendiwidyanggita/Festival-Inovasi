@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
+#[\Illuminate\Database\Eloquent\Attributes\Fillable(['festival_id', 'assessment_type', 'institution_assessment_id', 'assessment_criterion_id', 'score'])]
 class InstitutionAssessmentDetail extends Model
 {
     protected function casts(): array

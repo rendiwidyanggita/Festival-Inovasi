@@ -2,7 +2,7 @@
 
 namespace Database\Seeders;
 
-use App\Models\User;
+use App\Models\Festival;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
@@ -11,15 +11,20 @@ class DatabaseSeeder extends Seeder
     use WithoutModelEvents;
 
     /**
-     * Seed the application's database.
+     * Seed aplikasi: superadmin awal, festival periode berjalan,
+     * kategori/subkategori, dan kriteria penilaian.
+     *
+     * DemoSeeder (data contoh juri/peserta) tidak dijalankan di sini;
+     * panggil eksplisit pada lingkungan pengembangan lokal.
      */
     public function run(): void
     {
-        // User::factory(10)->create();
+        $this->call(SuperadminSeeder::class);
+        $this->call(FestivalSeeder::class);
 
-        User::factory()->create([
-            'name' => 'Test User',
-            'email' => 'test@example.com',
-        ]);
+        $festival = Festival::where('year', FestivalSeeder::targetYear())->firstOrFail();
+
+        $this->call(CategorySeeder::class, parameters: ['festival' => $festival]);
+        $this->call(AssessmentCriterionSeeder::class, parameters: ['festival' => $festival]);
     }
 }
