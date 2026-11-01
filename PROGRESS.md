@@ -4,7 +4,7 @@
 **Repositori:** https://github.com/rendiwidyanggita/Festival-Inovasi (branch `main`)  
 **Lokasi lokal:** `/home/rendiwidyanggita/Projects/Festival-Inovasi` (Linux WSL2)
 
-## Status saat ini — Phase 2 SELESAI (2026-11-01)
+## Status saat ini — Phase 3 SELESAI (2026-11-01)
 
 ### Sudah terimplementasi & terverifikasi (Phase 1 + 2)
 
@@ -52,23 +52,38 @@
     - `DatabaseSchemaTest` (3 tests: database structure and relationships baseline).
     - **Hasil: 57 tests, 148 assertions — 100% PASSED** (0 failures, 0 errors).
 16. **Audit Logs**: Implementasi `App\Services\AuditService::log()` & `logChange()` — mencatat actor, action, auditable (morph), changes (JSON), terintegrasi penuh di controllers master data.
+**Phase 3 (Scoring System — Parallel Subagents Backend & Frontend):**
 
-
-### Commit di GitHub
-- `chore: scaffold Laravel 13 project`
-- `feat(db): install festival inovasi migrations v0.1 + sessions table`
-- `feat(models): 7 enums, 17 eloquent models + relasi, morph map audit`
-- (commit seeder + test + analisis — lihat `git log` terbaru)
+17. **ScoringService (`App\Services\ScoringService`)**:
+    - `openScoring()`: Validasi peserta & juri > 0, bobot kriteria == 100, lock roster dalam transaksi DB, audit log.
+    - `closeScoring()`: Transisi subkategori ke status `closed`, audit log.
+    - `saveDraft()`: Penyimpanan nilai parsial/lengkap status `draft`.
+    - `submitAssessment()`: Validasi nilai integer 6..10 di semua kriteria, update status `submitted`, deteksi kelengkapan penilaian juri per subkategori (`completed_at`).
+    - `lockAssessment()`: Penguncian individual oleh superadmin (`locked`), audit log.
+    - `requestRevision()`: Pembukaan kembali nilai untuk diedit & disubmit ulang oleh juri (`revision_requested`), audit log + alasan.
+    - `calculateWeightedScore()`: Kalkulasi tertimbang $(\sum \text{score} \times \text{weight}) / 100$.
+    - `calculateAverageScore()`: Kalkulasi rata-rata tertimbang dari seluruh juri penilai valid.
+18. **Controllers & Form Requests**:
+    - `Jury\ParticipationController` (`index`, `store/sync`).
+    - `Jury\AssessmentController` (`show`, `assess`, `draft`, `submit`).
+    - `Admin\ScoringLifecycleController` (`openScoring`, `closeScoring`, `lockAssessment`, `requestRevision`).
+    - `Admin\ScoringMonitoringController` (matriks juri vs objek).
+    - Form requests: `SaveDraftRequest`, `SubmitAssessmentRequest`, `RevisionRequest`.
+19. **Blade Views & Tailwind CSS UI**:
+    - `resources/views/jury/participations/index.blade.php`: Pemilihan subkategori multi-checkbox saat `preparation`, indikator locked.
+    - `resources/views/jury/subcategories/show.blade.php`: Daftar objek subkategori, progress bar, badge status penilaian.
+    - `resources/views/jury/assessments/form.blade.php`: Form penilaian nilai 6..10 interaktif, info bobot, kalkulator tertimbang live via JS, status lock & revisi banner.
+    - `resources/views/admin/scoring/monitoring.blade.php`: Matriks monitoring progres, modal open/close scoring, modal lock/minta revisi.
+    - `resources/views/jury/dashboard.blade.php`: Widget statistik progres real-time.
+20. **Feature Tests Phase 3**:
+    - `tests/Feature/ScoringTest.php`: 22 test cases komprehensif.
+    - **Hasil Total Seluruh Suite: 79 tests, 219 assertions — 100% PASSED** (0 failures, 0 errors).
 
 ## Catatan penting untuk sesi berikutnya
 
-- Validasi lintas-row (score 6–10, bobot 100, roster lock, dsb.) **belum** diimplementasikan — tugas service layer Phase 3.
-- Kredensial superadmin dev ada di `.env` lokal (tidak di-commit); `.env.example` memuat placeholder.
+- Validasi perhitungan rata-rata dan status `locked` siap dikonsumsi langsung oleh modul perankingan & pemenang di Phase 4.
 
 ## Rencana tahap berikutnya
-
-### Phase 3 — Scoring System (BELUM)
-Pemilihan subkategori juri (hanya `preparation`), roster lock saat open (transaksi), form penilaian (draft/submit), service perhitungan tertimbang + rata-rata, monitoring, revisi & lock, audit nilai.
 
 ### Phase 4 — Reporting & Winner (BELUM)
 Ranking (hitung on-the-fly dari assessment locked), penetapan pemenang manual + validasi `winner_count`, PDF (`barryvdh/laravel-dompdf` — usulan), publikasi manual.

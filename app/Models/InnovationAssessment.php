@@ -55,4 +55,16 @@ class InnovationAssessment extends Model
         return (float) $this->details
             ->sum(fn (InnovationAssessmentDetail $detail) => $detail->score * $detail->criterion->weight) / 100;
     }
+
+    /** Catatan revisi dari superadmin jika diminta revisi. */
+    public function getRevisionNoteAttribute(): ?string
+    {
+        $log = AuditLog::where('auditable_type', $this->getMorphClass())
+            ->where('auditable_id', $this->id)
+            ->where('action', 'request_revision')
+            ->latest('id')
+            ->first();
+
+        return $log?->new_values['reason'] ?? null;
+    }
 }

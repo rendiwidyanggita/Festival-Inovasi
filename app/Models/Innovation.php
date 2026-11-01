@@ -38,4 +38,10 @@ class Innovation extends Model
     {
         return $this->hasMany(InnovationAssessment::class);
     }
+    
+    /** @return HasMany<InnovationAssessment, $this> */
+    public function assessments()
+    {
+        return $this->hasMany(InnovationAssessment::class);
+    }
 }

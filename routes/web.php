@@ -53,9 +53,29 @@ Route::middleware(['auth', 'role:superadmin'])->prefix('admin')->name('admin.')-
     
     // Assessment Criteria
     Route::resource('assessment-criteria', Admin\AssessmentCriterionController::class)->except(['show']);
+    
+    // Scoring Lifecycle
+    Route::post('/award-categories/{awardCategory}/open-scoring', [Admin\ScoringLifecycleController::class, 'openScoring'])->name('award-categories.open-scoring');
+    Route::post('/award-categories/{awardCategory}/close-scoring', [Admin\ScoringLifecycleController::class, 'closeScoring'])->name('award-categories.close-scoring');
+    Route::post('/assessments/{type}/{id}/lock', [Admin\ScoringLifecycleController::class, 'lockAssessment'])->name('assessments.lock');
+    Route::post('/assessments/{type}/{id}/request-revision', [Admin\ScoringLifecycleController::class, 'requestRevision'])->name('assessments.request-revision');
+    
+    // Scoring Monitoring
+    Route::get('/scoring/monitoring', [Admin\ScoringMonitoringController::class, 'index'])->name('scoring.monitoring');
 });
-
 // Jury routes
 Route::middleware(['auth', 'role:jury'])->prefix('jury')->name('jury.')->group(function () {
     Route::get('/', Jury\DashboardController::class)->name('dashboard');
+    
+    // Participations (Subcategory Selection)
+    Route::get('/festivals/{festival}/participations', [Jury\ParticipationController::class, 'index'])->name('participations.index');
+    Route::post('/festivals/{festival}/participations', [Jury\ParticipationController::class, 'store'])->name('participations.store');
+    
+    // Subcategories
+    Route::get('/subcategories/{awardCategory}', [Jury\AssessmentController::class, 'show'])->name('subcategories.show');
+    
+    // Assessments
+    Route::get('/subcategories/{awardCategory}/assess/{type}/{id}', [Jury\AssessmentController::class, 'assess'])->name('assessments.show');
+    Route::post('/subcategories/{awardCategory}/assess/{type}/{id}/draft', [Jury\AssessmentController::class, 'draft'])->name('assessments.draft');
+    Route::post('/subcategories/{awardCategory}/assess/{type}/{id}/submit', [Jury\AssessmentController::class, 'submit'])->name('assessments.submit');
 });

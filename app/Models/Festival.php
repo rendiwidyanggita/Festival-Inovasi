@@ -33,6 +33,12 @@ class Festival extends Model
     {
         return $this->hasMany(FestivalCategory::class);
     }
+    
+    /** Alias for festivalCategories */
+    public function categories()
+    {
+        return $this->festivalCategories();
+    }
 
     /** @return HasMany<AwardCategory, $this> */
     public function awardCategories(): HasMany
@@ -50,6 +56,12 @@ class Festival extends Model
     public function assessmentCriteria(): HasMany
     {
         return $this->hasMany(AssessmentCriterion::class);
+    }
+    
+    /** Alias for assessmentCriteria */
+    public function criteria()
+    {
+        return $this->assessmentCriteria();
     }
 
     /** @return HasMany<Institution, $this> */

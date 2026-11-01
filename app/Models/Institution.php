@@ -32,4 +32,10 @@ class Institution extends Model
     {
         return $this->hasMany(Innovation::class);
     }
+    
+    /** @return HasMany<InstitutionAssessment, $this> */
+    public function assessments()
+    {
+        return $this->hasMany(InstitutionAssessment::class);
+    }
 }
