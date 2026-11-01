@@ -83,17 +83,17 @@
         <!-- Mobile Backdrop Overlay -->
         <div id="mobile-sidebar-backdrop" 
              onclick="toggleMobileSidebar()" 
-             class="fixed inset-0 bg-slate-950/70 backdrop-blur-sm z-40 hidden lg:hidden transition-opacity duration-300 opacity-0"></div>
+             class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-40 hidden lg:hidden transition-opacity duration-300 opacity-0"></div>
 
         <!-- ========================================================= -->
         <!-- SIDEBAR -->
         <!-- ========================================================= -->
         <aside id="app-sidebar" 
-               class="fixed inset-y-0 left-0 z-50 w-64 bg-slate-950 border-r border-slate-800 flex flex-col justify-between transform -translate-x-full lg:translate-x-0 lg:static transition-all duration-300 ease-in-out shrink-0 select-none shadow-2xl lg:shadow-none">
+               class="fixed inset-y-0 left-0 z-50 w-64 bg-white border-r border-slate-200 flex flex-col justify-between transform -translate-x-full lg:translate-x-0 lg:static transition-all duration-300 ease-in-out shrink-0 select-none shadow-xl lg:shadow-none">
             
             <!-- Top: Brand Header -->
             <div>
-                <div class="h-16 flex items-center px-4 border-b border-slate-800/80 bg-slate-950/60 justify-between">
+                <div class="h-16 flex items-center px-4 border-b border-slate-200 bg-white justify-between">
                     <a href="{{ auth()->user()->isSuperadmin() ? route('admin.dashboard') : route('jury.dashboard') }}" 
                        class="flex items-center gap-3 group overflow-hidden">
                         <div class="sidebar-brand-icon w-9 h-9 rounded-xl bg-gradient-to-tr from-blue-600 to-indigo-500 flex items-center justify-center text-white shadow-md shadow-blue-500/20 shrink-0">
@@ -102,7 +102,7 @@
                             </svg>
                         </div>
                         <div class="sidebar-brand-text truncate">
-                            <span class="text-base font-bold text-white tracking-tight group-hover:text-blue-400 transition-colors">
+                            <span class="text-base font-bold text-slate-900 tracking-tight group-hover:text-blue-600 transition-colors">
                                 Festival Inovasi
                             </span>
                             <span class="block text-[10px] uppercase font-semibold tracking-wider text-slate-500">
@@ -112,7 +112,7 @@
                     </a>
 
                     <!-- Close button on Mobile only -->
-                    <button type="button" onclick="toggleMobileSidebar()" class="lg:hidden text-slate-400 hover:text-white p-1.5 rounded-lg hover:bg-slate-800">
+                    <button type="button" onclick="toggleMobileSidebar()" class="lg:hidden text-slate-500 hover:text-slate-900 p-1.5 rounded-lg hover:bg-slate-100">
                         <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
                         </svg>
@@ -120,25 +120,25 @@
                 </div>
 
                 <!-- Navigation Links List -->
-                <nav class="p-3 space-y-6 overflow-y-auto max-h-[calc(100vh-8.5rem)] scrollbar-thin scrollbar-thumb-slate-800">
+                <nav class="p-3 space-y-6 overflow-y-auto max-h-[calc(100vh-8.5rem)] scrollbar-thin scrollbar-thumb-slate-200">
                     
                     @if(auth()->user()->isSuperadmin())
                         <!-- Section: UTAMA -->
                         <div>
-                            <div class="sidebar-section-header px-3 mb-2 text-[10px] font-bold uppercase tracking-wider text-slate-500 sidebar-transition-element">
+                            <div class="sidebar-section-header px-3 mb-2 text-[10px] font-bold uppercase tracking-wider text-slate-600 sidebar-transition-element">
                                 Menu Utama
                             </div>
                             <div class="space-y-1">
                                 <!-- Dashboard -->
                                 <div class="relative group">
                                     <a href="{{ route('admin.dashboard') }}" 
-                                       class="nav-item-link flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-150 {{ request()->routeIs('admin.dashboard') ? 'bg-blue-600 text-white font-semibold shadow-md shadow-blue-600/30' : 'text-slate-400 hover:text-slate-100 hover:bg-slate-900' }}">
+                                       class="nav-item-link flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-150 {{ request()->routeIs('admin.dashboard') ? 'bg-blue-600 text-white font-semibold shadow-md shadow-blue-600/30' : 'text-slate-700 hover:text-slate-900 hover:bg-slate-100' }}">
                                         <svg class="w-5 h-5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                                             <path stroke-linecap="round" stroke-linejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
                                         </svg>
                                         <span class="sidebar-label truncate">Dashboard</span>
                                     </a>
-                                    <span class="tooltip-when-collapsed absolute left-full ml-2 top-1/2 -translate-y-1/2 px-2.5 py-1.5 bg-slate-900 text-white text-xs font-semibold rounded-lg shadow-xl z-50 pointer-events-none border border-slate-700 whitespace-nowrap opacity-0 transition-opacity duration-150">
+                                    <span class="tooltip-when-collapsed absolute left-full ml-2 top-1/2 -translate-y-1/2 px-2.5 py-1.5 bg-slate-900 text-white text-xs font-semibold rounded-lg shadow-xl z-50 pointer-events-none border border-slate-800 whitespace-nowrap opacity-0 transition-opacity duration-150">
                                         Dashboard
                                     </span>
                                 </div>
@@ -147,20 +147,20 @@
 
                         <!-- Section: MASTER DATA -->
                         <div>
-                            <div class="sidebar-section-header px-3 mb-2 text-[10px] font-bold uppercase tracking-wider text-slate-500 sidebar-transition-element">
+                            <div class="sidebar-section-header px-3 mb-2 text-[10px] font-bold uppercase tracking-wider text-slate-600 sidebar-transition-element">
                                 Master Data
                             </div>
                             <div class="space-y-1">
                                 <!-- Festival -->
                                 <div class="relative group">
                                     <a href="{{ route('admin.festivals.index') }}" 
-                                       class="nav-item-link flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-150 {{ request()->routeIs('admin.festivals.*') ? 'bg-blue-600 text-white font-semibold shadow-md shadow-blue-600/30' : 'text-slate-400 hover:text-slate-100 hover:bg-slate-900' }}">
+                                       class="nav-item-link flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-150 {{ request()->routeIs('admin.festivals.*') ? 'bg-blue-600 text-white font-semibold shadow-md shadow-blue-600/30' : 'text-slate-700 hover:text-slate-900 hover:bg-slate-100' }}">
                                         <svg class="w-5 h-5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                                             <path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                                         </svg>
                                         <span class="sidebar-label truncate">Festival</span>
                                     </a>
-                                    <span class="tooltip-when-collapsed absolute left-full ml-2 top-1/2 -translate-y-1/2 px-2.5 py-1.5 bg-slate-900 text-white text-xs font-semibold rounded-lg shadow-xl z-50 pointer-events-none border border-slate-700 whitespace-nowrap opacity-0 transition-opacity duration-150">
+                                    <span class="tooltip-when-collapsed absolute left-full ml-2 top-1/2 -translate-y-1/2 px-2.5 py-1.5 bg-slate-900 text-white text-xs font-semibold rounded-lg shadow-xl z-50 pointer-events-none border border-slate-800 whitespace-nowrap opacity-0 transition-opacity duration-150">
                                         Festival
                                     </span>
                                 </div>
@@ -168,13 +168,13 @@
                                 <!-- Kategori & Subkategori -->
                                 <div class="relative group">
                                     <a href="{{ route('admin.festival-categories.index') }}" 
-                                       class="nav-item-link flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-150 {{ (request()->routeIs('admin.festival-categories.*') || request()->routeIs('admin.award-categories.*')) ? 'bg-blue-600 text-white font-semibold shadow-md shadow-blue-600/30' : 'text-slate-400 hover:text-slate-100 hover:bg-slate-900' }}">
+                                       class="nav-item-link flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-150 {{ (request()->routeIs('admin.festival-categories.*') || request()->routeIs('admin.award-categories.*')) ? 'bg-blue-600 text-white font-semibold shadow-md shadow-blue-600/30' : 'text-slate-700 hover:text-slate-900 hover:bg-slate-100' }}">
                                         <svg class="w-5 h-5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                                             <path stroke-linecap="round" stroke-linejoin="round" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
                                         </svg>
                                         <span class="sidebar-label truncate">Kategori & Subkategori</span>
                                     </a>
-                                    <span class="tooltip-when-collapsed absolute left-full ml-2 top-1/2 -translate-y-1/2 px-2.5 py-1.5 bg-slate-900 text-white text-xs font-semibold rounded-lg shadow-xl z-50 pointer-events-none border border-slate-700 whitespace-nowrap opacity-0 transition-opacity duration-150">
+                                    <span class="tooltip-when-collapsed absolute left-full ml-2 top-1/2 -translate-y-1/2 px-2.5 py-1.5 bg-slate-900 text-white text-xs font-semibold rounded-lg shadow-xl z-50 pointer-events-none border border-slate-800 whitespace-nowrap opacity-0 transition-opacity duration-150">
                                         Kategori & Subkategori
                                     </span>
                                 </div>
@@ -182,13 +182,13 @@
                                 <!-- Instansi -->
                                 <div class="relative group">
                                     <a href="{{ route('admin.institutions.index') }}" 
-                                       class="nav-item-link flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-150 {{ request()->routeIs('admin.institutions.*') ? 'bg-blue-600 text-white font-semibold shadow-md shadow-blue-600/30' : 'text-slate-400 hover:text-slate-100 hover:bg-slate-900' }}">
+                                       class="nav-item-link flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-150 {{ request()->routeIs('admin.institutions.*') ? 'bg-blue-600 text-white font-semibold shadow-md shadow-blue-600/30' : 'text-slate-700 hover:text-slate-900 hover:bg-slate-100' }}">
                                         <svg class="w-5 h-5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                                             <path stroke-linecap="round" stroke-linejoin="round" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
                                         </svg>
                                         <span class="sidebar-label truncate">Instansi</span>
                                     </a>
-                                    <span class="tooltip-when-collapsed absolute left-full ml-2 top-1/2 -translate-y-1/2 px-2.5 py-1.5 bg-slate-900 text-white text-xs font-semibold rounded-lg shadow-xl z-50 pointer-events-none border border-slate-700 whitespace-nowrap opacity-0 transition-opacity duration-150">
+                                    <span class="tooltip-when-collapsed absolute left-full ml-2 top-1/2 -translate-y-1/2 px-2.5 py-1.5 bg-slate-900 text-white text-xs font-semibold rounded-lg shadow-xl z-50 pointer-events-none border border-slate-800 whitespace-nowrap opacity-0 transition-opacity duration-150">
                                         Instansi
                                     </span>
                                 </div>
@@ -196,13 +196,13 @@
                                 <!-- Inovasi -->
                                 <div class="relative group">
                                     <a href="{{ route('admin.innovations.index') }}" 
-                                       class="nav-item-link flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-150 {{ request()->routeIs('admin.innovations.*') ? 'bg-blue-600 text-white font-semibold shadow-md shadow-blue-600/30' : 'text-slate-400 hover:text-slate-100 hover:bg-slate-900' }}">
+                                       class="nav-item-link flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-150 {{ request()->routeIs('admin.innovations.*') ? 'bg-blue-600 text-white font-semibold shadow-md shadow-blue-600/30' : 'text-slate-700 hover:text-slate-900 hover:bg-slate-100' }}">
                                         <svg class="w-5 h-5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                                             <path stroke-linecap="round" stroke-linejoin="round" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
                                         </svg>
                                         <span class="sidebar-label truncate">Inovasi</span>
                                     </a>
-                                    <span class="tooltip-when-collapsed absolute left-full ml-2 top-1/2 -translate-y-1/2 px-2.5 py-1.5 bg-slate-900 text-white text-xs font-semibold rounded-lg shadow-xl z-50 pointer-events-none border border-slate-700 whitespace-nowrap opacity-0 transition-opacity duration-150">
+                                    <span class="tooltip-when-collapsed absolute left-full ml-2 top-1/2 -translate-y-1/2 px-2.5 py-1.5 bg-slate-900 text-white text-xs font-semibold rounded-lg shadow-xl z-50 pointer-events-none border border-slate-800 whitespace-nowrap opacity-0 transition-opacity duration-150">
                                         Inovasi
                                     </span>
                                 </div>
@@ -210,13 +210,13 @@
                                 <!-- Akun Juri -->
                                 <div class="relative group">
                                     <a href="{{ route('admin.juries.index') }}" 
-                                       class="nav-item-link flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-150 {{ request()->routeIs('admin.juries.*') ? 'bg-blue-600 text-white font-semibold shadow-md shadow-blue-600/30' : 'text-slate-400 hover:text-slate-100 hover:bg-slate-900' }}">
+                                       class="nav-item-link flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-150 {{ request()->routeIs('admin.juries.*') ? 'bg-blue-600 text-white font-semibold shadow-md shadow-blue-600/30' : 'text-slate-700 hover:text-slate-900 hover:bg-slate-100' }}">
                                         <svg class="w-5 h-5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                                             <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
                                         </svg>
                                         <span class="sidebar-label truncate">Kelola Akun Juri</span>
                                     </a>
-                                    <span class="tooltip-when-collapsed absolute left-full ml-2 top-1/2 -translate-y-1/2 px-2.5 py-1.5 bg-slate-900 text-white text-xs font-semibold rounded-lg shadow-xl z-50 pointer-events-none border border-slate-700 whitespace-nowrap opacity-0 transition-opacity duration-150">
+                                    <span class="tooltip-when-collapsed absolute left-full ml-2 top-1/2 -translate-y-1/2 px-2.5 py-1.5 bg-slate-900 text-white text-xs font-semibold rounded-lg shadow-xl z-50 pointer-events-none border border-slate-800 whitespace-nowrap opacity-0 transition-opacity duration-150">
                                         Kelola Akun Juri
                                     </span>
                                 </div>
@@ -224,13 +224,13 @@
                                 <!-- Kriteria Penilaian -->
                                 <div class="relative group">
                                     <a href="{{ route('admin.assessment-criteria.index') }}" 
-                                       class="nav-item-link flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-150 {{ request()->routeIs('admin.assessment-criteria.*') ? 'bg-blue-600 text-white font-semibold shadow-md shadow-blue-600/30' : 'text-slate-400 hover:text-slate-100 hover:bg-slate-900' }}">
+                                       class="nav-item-link flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-150 {{ request()->routeIs('admin.assessment-criteria.*') ? 'bg-blue-600 text-white font-semibold shadow-md shadow-blue-600/30' : 'text-slate-700 hover:text-slate-900 hover:bg-slate-100' }}">
                                         <svg class="w-5 h-5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                                             <path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
                                         </svg>
                                         <span class="sidebar-label truncate">Kriteria & Bobot</span>
                                     </a>
-                                    <span class="tooltip-when-collapsed absolute left-full ml-2 top-1/2 -translate-y-1/2 px-2.5 py-1.5 bg-slate-900 text-white text-xs font-semibold rounded-lg shadow-xl z-50 pointer-events-none border border-slate-700 whitespace-nowrap opacity-0 transition-opacity duration-150">
+                                    <span class="tooltip-when-collapsed absolute left-full ml-2 top-1/2 -translate-y-1/2 px-2.5 py-1.5 bg-slate-900 text-white text-xs font-semibold rounded-lg shadow-xl z-50 pointer-events-none border border-slate-800 whitespace-nowrap opacity-0 transition-opacity duration-150">
                                         Kriteria & Bobot
                                     </span>
                                 </div>
@@ -239,20 +239,20 @@
 
                         <!-- Section: PENILAIAN & LAPORAN -->
                         <div>
-                            <div class="sidebar-section-header px-3 mb-2 text-[10px] font-bold uppercase tracking-wider text-slate-500 sidebar-transition-element">
+                            <div class="sidebar-section-header px-3 mb-2 text-[10px] font-bold uppercase tracking-wider text-slate-600 sidebar-transition-element">
                                 Penilaian & Hasil
                             </div>
                             <div class="space-y-1">
                                 <!-- Penugasan Juri -->
                                 <div class="relative group">
                                     <a href="{{ route('admin.festival-juries.index') }}" 
-                                       class="nav-item-link flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-150 {{ request()->routeIs('admin.festival-juries.*') ? 'bg-blue-600 text-white font-semibold shadow-md shadow-blue-600/30' : 'text-slate-400 hover:text-slate-100 hover:bg-slate-900' }}">
+                                       class="nav-item-link flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-150 {{ request()->routeIs('admin.festival-juries.*') ? 'bg-blue-600 text-white font-semibold shadow-md shadow-blue-600/30' : 'text-slate-700 hover:text-slate-900 hover:bg-slate-100' }}">
                                         <svg class="w-5 h-5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                                             <path stroke-linecap="round" stroke-linejoin="round" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" />
                                         </svg>
                                         <span class="sidebar-label truncate">Penugasan Juri</span>
                                     </a>
-                                    <span class="tooltip-when-collapsed absolute left-full ml-2 top-1/2 -translate-y-1/2 px-2.5 py-1.5 bg-slate-900 text-white text-xs font-semibold rounded-lg shadow-xl z-50 pointer-events-none border border-slate-700 whitespace-nowrap opacity-0 transition-opacity duration-150">
+                                    <span class="tooltip-when-collapsed absolute left-full ml-2 top-1/2 -translate-y-1/2 px-2.5 py-1.5 bg-slate-900 text-white text-xs font-semibold rounded-lg shadow-xl z-50 pointer-events-none border border-slate-800 whitespace-nowrap opacity-0 transition-opacity duration-150">
                                         Penugasan Juri
                                     </span>
                                 </div>
@@ -260,13 +260,13 @@
                                 <!-- Monitoring Penilaian -->
                                 <div class="relative group">
                                     <a href="{{ route('admin.scoring.monitoring') }}" 
-                                       class="nav-item-link flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-150 {{ request()->routeIs('admin.scoring.*') ? 'bg-blue-600 text-white font-semibold shadow-md shadow-blue-600/30' : 'text-slate-400 hover:text-slate-100 hover:bg-slate-900' }}">
+                                       class="nav-item-link flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-150 {{ request()->routeIs('admin.scoring.*') ? 'bg-blue-600 text-white font-semibold shadow-md shadow-blue-600/30' : 'text-slate-700 hover:text-slate-900 hover:bg-slate-100' }}">
                                         <svg class="w-5 h-5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                                             <path stroke-linecap="round" stroke-linejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
                                         </svg>
                                         <span class="sidebar-label truncate">Monitoring Nilai</span>
                                     </a>
-                                    <span class="tooltip-when-collapsed absolute left-full ml-2 top-1/2 -translate-y-1/2 px-2.5 py-1.5 bg-slate-900 text-white text-xs font-semibold rounded-lg shadow-xl z-50 pointer-events-none border border-slate-700 whitespace-nowrap opacity-0 transition-opacity duration-150">
+                                    <span class="tooltip-when-collapsed absolute left-full ml-2 top-1/2 -translate-y-1/2 px-2.5 py-1.5 bg-slate-900 text-white text-xs font-semibold rounded-lg shadow-xl z-50 pointer-events-none border border-slate-800 whitespace-nowrap opacity-0 transition-opacity duration-150">
                                         Monitoring Nilai
                                     </span>
                                 </div>
@@ -274,13 +274,13 @@
                                 <!-- Pemenang -->
                                 <div class="relative group">
                                     <a href="{{ route('admin.winners.index') }}" 
-                                       class="nav-item-link flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-150 {{ (request()->routeIs('admin.winners.*') || request()->routeIs('admin.award-categories.rankings')) ? 'bg-blue-600 text-white font-semibold shadow-md shadow-blue-600/30' : 'text-slate-400 hover:text-slate-100 hover:bg-slate-900' }}">
+                                       class="nav-item-link flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-150 {{ (request()->routeIs('admin.winners.*') || request()->routeIs('admin.award-categories.rankings')) ? 'bg-blue-600 text-white font-semibold shadow-md shadow-blue-600/30' : 'text-slate-700 hover:text-slate-900 hover:bg-slate-100' }}">
                                         <svg class="w-5 h-5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                                             <path stroke-linecap="round" stroke-linejoin="round" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
                                         </svg>
                                         <span class="sidebar-label truncate">Penetapan Pemenang</span>
                                     </a>
-                                    <span class="tooltip-when-collapsed absolute left-full ml-2 top-1/2 -translate-y-1/2 px-2.5 py-1.5 bg-slate-900 text-white text-xs font-semibold rounded-lg shadow-xl z-50 pointer-events-none border border-slate-700 whitespace-nowrap opacity-0 transition-opacity duration-150">
+                                    <span class="tooltip-when-collapsed absolute left-full ml-2 top-1/2 -translate-y-1/2 px-2.5 py-1.5 bg-slate-900 text-white text-xs font-semibold rounded-lg shadow-xl z-50 pointer-events-none border border-slate-800 whitespace-nowrap opacity-0 transition-opacity duration-150">
                                         Penetapan Pemenang
                                     </span>
                                 </div>
@@ -288,13 +288,13 @@
                                 <!-- Laporan PDF -->
                                 <div class="relative group">
                                     <a href="{{ route('admin.reports.index') }}" 
-                                       class="nav-item-link flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-150 {{ request()->routeIs('admin.reports.*') ? 'bg-blue-600 text-white font-semibold shadow-md shadow-blue-600/30' : 'text-slate-400 hover:text-slate-100 hover:bg-slate-900' }}">
+                                       class="nav-item-link flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-150 {{ request()->routeIs('admin.reports.*') ? 'bg-blue-600 text-white font-semibold shadow-md shadow-blue-600/30' : 'text-slate-700 hover:text-slate-900 hover:bg-slate-100' }}">
                                         <svg class="w-5 h-5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                                             <path stroke-linecap="round" stroke-linejoin="round" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
                                         </svg>
                                         <span class="sidebar-label truncate">Laporan & Publikasi</span>
                                     </a>
-                                    <span class="tooltip-when-collapsed absolute left-full ml-2 top-1/2 -translate-y-1/2 px-2.5 py-1.5 bg-slate-900 text-white text-xs font-semibold rounded-lg shadow-xl z-50 pointer-events-none border border-slate-700 whitespace-nowrap opacity-0 transition-opacity duration-150">
+                                    <span class="tooltip-when-collapsed absolute left-full ml-2 top-1/2 -translate-y-1/2 px-2.5 py-1.5 bg-slate-900 text-white text-xs font-semibold rounded-lg shadow-xl z-50 pointer-events-none border border-slate-800 whitespace-nowrap opacity-0 transition-opacity duration-150">
                                         Laporan & Publikasi
                                     </span>
                                 </div>
@@ -304,20 +304,20 @@
                     @elseif(auth()->user()->isJury())
                         <!-- Section: MENU JURI -->
                         <div>
-                            <div class="sidebar-section-header px-3 mb-2 text-[10px] font-bold uppercase tracking-wider text-slate-500 sidebar-transition-element">
+                            <div class="sidebar-section-header px-3 mb-2 text-[10px] font-bold uppercase tracking-wider text-slate-600 sidebar-transition-element">
                                 Penilaian Juri
                             </div>
                             <div class="space-y-1">
                                 <!-- Dashboard Juri -->
                                 <div class="relative group">
                                     <a href="{{ route('jury.dashboard') }}" 
-                                       class="nav-item-link flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-150 {{ request()->routeIs('jury.dashboard') ? 'bg-blue-600 text-white font-semibold shadow-md shadow-blue-600/30' : 'text-slate-400 hover:text-slate-100 hover:bg-slate-900' }}">
+                                       class="nav-item-link flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-150 {{ request()->routeIs('jury.dashboard') ? 'bg-blue-600 text-white font-semibold shadow-md shadow-blue-600/30' : 'text-slate-700 hover:text-slate-900 hover:bg-slate-100' }}">
                                         <svg class="w-5 h-5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                                             <path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
                                         </svg>
                                         <span class="sidebar-label truncate">Dashboard Penilaian</span>
                                     </a>
-                                    <span class="tooltip-when-collapsed absolute left-full ml-2 top-1/2 -translate-y-1/2 px-2.5 py-1.5 bg-slate-900 text-white text-xs font-semibold rounded-lg shadow-xl z-50 pointer-events-none border border-slate-700 whitespace-nowrap opacity-0 transition-opacity duration-150">
+                                    <span class="tooltip-when-collapsed absolute left-full ml-2 top-1/2 -translate-y-1/2 px-2.5 py-1.5 bg-slate-900 text-white text-xs font-semibold rounded-lg shadow-xl z-50 pointer-events-none border border-slate-800 whitespace-nowrap opacity-0 transition-opacity duration-150">
                                         Dashboard Penilaian
                                     </span>
                                 </div>
@@ -326,13 +326,13 @@
                                     <!-- Pilih Subkategori Partisipasi -->
                                     <div class="relative group">
                                         <a href="{{ route('jury.participations.index', $currentFestival) }}" 
-                                           class="nav-item-link flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-150 {{ request()->routeIs('jury.participations.*') ? 'bg-blue-600 text-white font-semibold shadow-md shadow-blue-600/30' : 'text-slate-400 hover:text-slate-100 hover:bg-slate-900' }}">
+                                            class="nav-item-link flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-150 {{ request()->routeIs('jury.participations.*') ? 'bg-blue-600 text-white font-semibold shadow-md shadow-blue-600/30' : 'text-slate-700 hover:text-slate-900 hover:bg-slate-100' }}">
                                             <svg class="w-5 h-5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                                                 <path stroke-linecap="round" stroke-linejoin="round" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
                                             </svg>
                                             <span class="sidebar-label truncate">Pilih Subkategori</span>
                                         </a>
-                                        <span class="tooltip-when-collapsed absolute left-full ml-2 top-1/2 -translate-y-1/2 px-2.5 py-1.5 bg-slate-900 text-white text-xs font-semibold rounded-lg shadow-xl z-50 pointer-events-none border border-slate-700 whitespace-nowrap opacity-0 transition-opacity duration-150">
+                                        <span class="tooltip-when-collapsed absolute left-full ml-2 top-1/2 -translate-y-1/2 px-2.5 py-1.5 bg-slate-900 text-white text-xs font-semibold rounded-lg shadow-xl z-50 pointer-events-none border border-slate-800 whitespace-nowrap opacity-0 transition-opacity duration-150">
                                             Pilih Subkategori
                                         </span>
                                     </div>
@@ -345,10 +345,10 @@
             </div>
 
             <!-- Bottom: Collapse Toggle Button (Desktop) -->
-            <div class="p-3 border-t border-slate-800/80 bg-slate-950/80">
+            <div class="p-3 border-t border-slate-200 bg-slate-50/50">
                 <button type="button" 
                         onclick="toggleSidebar()" 
-                        class="sidebar-collapse-btn w-full flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-semibold text-slate-400 hover:text-white hover:bg-slate-900 transition-colors">
+                        class="sidebar-collapse-btn w-full flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-semibold text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition-colors">
                     <svg class="sidebar-collapse-icon w-4 h-4 shrink-0 transition-transform duration-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M11 19l-7-7 7-7m8 14l-7-7 7-7" />
                     </svg>
@@ -416,33 +416,70 @@
                                 </a>
                             @endif
 
-                            <!-- User Info Profile -->
-                            <div class="flex items-center gap-2.5 pl-2 sm:border-l border-gray-200">
-                                <div class="w-8 h-8 rounded-full bg-slate-900 text-white font-bold text-xs flex items-center justify-center shrink-0 shadow-sm">
-                                    {{ strtoupper(substr(auth()->user()->name, 0, 2)) }}
-                                </div>
-                                <div class="hidden sm:block text-left">
-                                    <div class="text-xs font-semibold text-gray-900 leading-tight">
-                                        {{ auth()->user()->name }}
+                            <!-- User Profile Dropdown (Alpine.js) -->
+                            <div x-data="{ open: false }" class="relative" @click.away="open = false">
+                                <!-- Profile Button -->
+                                <button type="button" 
+                                        @click="open = !open" 
+                                        class="flex items-center gap-2.5 pl-2 sm:border-l border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 rounded-lg p-1 transition-colors hover:bg-gray-50"
+                                        :class="{ 'bg-gray-50': open }">
+                                    <div class="w-8 h-8 rounded-full bg-slate-900 text-white font-bold text-xs flex items-center justify-center shrink-0 shadow-sm">
+                                        {{ strtoupper(substr(auth()->user()->name, 0, 2)) }}
                                     </div>
-                                    <div class="text-[10px] font-medium text-slate-500 uppercase tracking-wider">
-                                        {{ auth()->user()->role->label() }}
+                                    <div class="hidden sm:block text-left">
+                                        <div class="text-xs font-semibold text-gray-900 leading-tight">
+                                            {{ auth()->user()->name }}
+                                        </div>
+                                        <div class="text-[10px] font-medium text-slate-500 uppercase tracking-wider">
+                                            {{ auth()->user()->role->label() }}
+                                        </div>
+                                    </div>
+                                    <!-- Dropdown Arrow -->
+                                    <svg class="w-4 h-4 text-gray-400 transition-transform duration-200 hidden sm:block" 
+                                         fill="none" 
+                                         viewBox="0 0 24 24" 
+                                         stroke="currentColor"
+                                         :class="{ 'rotate-180': open }">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                                    </svg>
+                                </button>
+                                
+                                <!-- Dropdown Menu -->
+                                <div x-show="open" 
+                                     x-transition:enter="transition ease-out duration-200"
+                                     x-transition:enter-start="opacity-0 transform scale-95"
+                                     x-transition:enter-end="opacity-100 transform scale-100"
+                                     x-transition:leave="transition ease-in duration-75"
+                                     x-transition:leave-start="opacity-100 transform scale-100"
+                                     x-transition:leave-end="opacity-0 transform scale-95"
+                                     class="absolute right-0 mt-2 w-56 rounded-xl bg-white border border-gray-200 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none z-50 overflow-hidden"
+                                     style="display: none;">
+                                    
+                                    <!-- User Info Section -->
+                                    <div class="px-4 py-3 border-b border-gray-100 bg-gray-50/50">
+                                        <div class="text-sm font-semibold text-gray-900">
+                                            {{ auth()->user()->name }}
+                                        </div>
+                                        <div class="text-xs text-slate-500 uppercase tracking-wider font-medium">
+                                            {{ auth()->user()->role->label() }}
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Logout Action -->
+                                    <div class="p-2">
+                                        <form method="POST" action="{{ route('logout') }}">
+                                            @csrf
+                                            <button type="submit" 
+                                                    class="w-full flex items-center gap-2 px-3 py-2.5 rounded-lg text-sm font-medium text-red-600 hover:text-white hover:bg-red-600 transition-colors">
+                                                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                                                </svg>
+                                                <span>Keluar</span>
+                                            </button>
+                                        </form>
                                     </div>
                                 </div>
                             </div>
-
-                            <!-- Logout Button (Always top right) -->
-                            <form method="POST" action="{{ route('logout') }}" class="inline">
-                                @csrf
-                                <button type="submit" 
-                                        title="Keluar dari sistem"
-                                        class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold text-red-600 hover:text-white hover:bg-red-600 border border-red-200 hover:border-red-600 transition-all duration-150">
-                                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                        <path stroke-linecap="round" stroke-linejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-                                    </svg>
-                                    <span class="hidden sm:inline">Keluar</span>
-                                </button>
-                            </form>
                         </div>
                     </div>
                 </div>
