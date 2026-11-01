@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Enums\ScoringStatus;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -10,6 +11,8 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 #[\Illuminate\Database\Eloquent\Attributes\Fillable(['festival_id', 'festival_category_id', 'name', 'winner_count', 'scoring_status', 'sort_order', 'opened_at', 'opened_by', 'closed_at', 'closed_by'])]
 class AwardCategory extends Model
 {
+    use HasFactory;
+
     protected function casts(): array
     {
         return [

@@ -2,15 +2,18 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
+
 #[\Illuminate\Database\Eloquent\Attributes\Fillable(['festival_id', 'award_category_id', 'institution_id', 'name', 'innovator_name'])]
 class Innovation extends Model
 {
-    use SoftDeletes;
+    use HasFactory, SoftDeletes;
+
 
     /** @return BelongsTo<Festival, $this> */
     public function festival(): BelongsTo
