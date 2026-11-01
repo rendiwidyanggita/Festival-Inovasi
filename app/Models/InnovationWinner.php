@@ -5,16 +5,16 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-#[\Illuminate\Database\Eloquent\Attributes\Fillable(['festival_id', 'award_category_id', 'innovation_id', 'position', 'appointed_by', 'appointed_at', 'notes'])]
+#[\Illuminate\Database\Eloquent\Attributes\Fillable(['festival_id', 'award_category_id', 'innovation_id', 'position', 'appointed_by', 'appointed_at', 'total_score', 'notes'])]
 class InnovationWinner extends Model
 {
-    /** @return BelongsTo<Festival, $this> */
-    public function festival(): BelongsTo
+    protected function casts(): array
     {
-        return $this->belongsTo(Festival::class);
+        return [
+            'appointed_at' => 'datetime',
+            'total_score' => 'decimal:2',
+        ];
     }
-
-    /** @return BelongsTo<AwardCategory, $this> */
     public function awardCategory(): BelongsTo
     {
         return $this->belongsTo(AwardCategory::class);

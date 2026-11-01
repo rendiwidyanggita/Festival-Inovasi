@@ -1,6 +1,9 @@
 <?php
 
 use App\Http\Controllers\Admin;
+use App\Http\Controllers\Admin\PublicationController;
+use App\Http\Controllers\Admin\ReportController;
+use App\Http\Controllers\Admin\WinnerController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Jury;
 use App\Http\Controllers\PublicController;
@@ -54,7 +57,22 @@ Route::middleware(['auth', 'role:superadmin'])->prefix('admin')->name('admin.')-
     // Assessment Criteria
     Route::resource('assessment-criteria', Admin\AssessmentCriterionController::class)->except(['show']);
     
-    // Scoring Lifecycle
+    
+    // Winners Management
+    Route::get('/winners', [Admin\WinnerController::class, 'index'])->name('winners.index');
+    Route::get('/award-categories/{awardCategory}/rankings', [Admin\WinnerController::class, 'rankings'])->name('award-categories.rankings');
+    Route::post('/award-categories/{awardCategory}/winners', [Admin\WinnerController::class, 'store'])->name('award-categories.winners.store');
+    Route::patch('/winners/{winnerType}/{winnerId}', [Admin\WinnerController::class, 'update'])->name('winners.update');
+    Route::delete('/winners/{winnerType}/{winnerId}', [Admin\WinnerController::class, 'destroy'])->name('winners.destroy');
+    
+    // Reports
+    Route::get('/reports', [Admin\ReportController::class, 'index'])->name('reports.index');
+    Route::get('/reports/{awardCategory}/preview', [Admin\ReportController::class, 'preview'])->name('reports.preview');
+    Route::get('/reports/{awardCategory}/pdf', [Admin\ReportController::class, 'pdf'])->name('reports.pdf');
+    
+    // Publication
+    Route::post('/festivals/{festival}/publish-results', [Admin\PublicationController::class, 'publish'])->name('festivals.publish-results');
+    Route::post('/festivals/{festival}/unpublish-results', [Admin\PublicationController::class, 'unpublish'])->name('festivals.unpublish-results');
     Route::post('/award-categories/{awardCategory}/open-scoring', [Admin\ScoringLifecycleController::class, 'openScoring'])->name('award-categories.open-scoring');
     Route::post('/award-categories/{awardCategory}/close-scoring', [Admin\ScoringLifecycleController::class, 'closeScoring'])->name('award-categories.close-scoring');
     Route::post('/assessments/{type}/{id}/lock', [Admin\ScoringLifecycleController::class, 'lockAssessment'])->name('assessments.lock');
