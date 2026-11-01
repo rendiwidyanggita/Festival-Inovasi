@@ -4,9 +4,7 @@
 **Repositori:** https://github.com/rendiwidyanggita/Festival-Inovasi (branch `main`)  
 **Lokasi lokal:** `/home/rendiwidyanggita/Projects/Festival-Inovasi` (Linux WSL2)
 
-## Status saat ini — Phase 4 SELESAI (2026-11-01)
-
-### Sudah terimplementasi & terverifikasi (Phase 1 + 2)
+## Status saat ini — UI/UX Overhaul & PRD Seeding SELESAI (2026-11-01)
 
 **Phase 1:**
 1. **Scaffold Laravel 13.17** (PHP 8.5.4, Composer 2.9.5), `.env` MySQL lokal, `git init`, remote GitHub, 3 commit ter-push.
@@ -100,9 +98,30 @@
     - `resources/views/admin/dashboard.blade.php`: Shortcut cards ke Penetapan Pemenang dan Laporan PDF.
 25. **Feature Tests Phase 4**:
     - `tests/Feature/ReportingTest.php`: 11 test cases komprehensif.
-    - **Hasil Total Seluruh Suite: 90 tests, 252 assertions — 100% PASSED** (0 failures, 0 errors).
+    - **Hasil Total Seluruh Suite: 102 tests, 289 assertions — 100% PASSED** (0 failures, 0 errors).
 
-## Catatan penting untuk sesi berikutnya
+26. **Comprehensive End-to-End Smoke Verification (`tests/Feature/ComprehensiveSmokeTest.php`)**:
+    - 12 comprehensive scenario tests memverifikasi:
+      1. Halaman publik (home, festival detail, kategori) ter-render bersih tanpa error.
+      2. Dashboard admin & modul pemilihan periode festival aktif & berpindah periode dengan mulus.
+      3. CRUD Festival (list, create, edit, show, publish/unpublish) terintegrasi.
+      4. Kategori Festival (list, create, edit, sort order) terintegrasi.
+      5. Subkategori/Award Category (list per kategori festival, create, edit, status lock) terintegrasi.
+      6. Instansi (list, create, edit, delete guard saat scoring dibuka).
+      7. Inovasi (list, create, edit, foreign keys, delete guard saat scoring dibuka).
+      8. Manajemen Juri (list, create, edit, soft delete, restore POST endpoint).
+      9. Kriteria Penilaian (list, create, edit, validasi bobot 100).
+      10. Matriks Monitoring Penilaian (monitoring progress per juri & objek, lock & revision modal).
+      11. Penetapan Pemenang & Cetak Laporan PDF (ranking preview, assign winners form & API, download PDF).
+      12. Jury Portal Flow (dashboard progress indicators, pemilihan subkategori partisipasi, form penilaian 6..10 interaktif).
+    - Asset Frontend (`npm run build`) Vite v8.3.5: Build sukses (CSS 91.50 kB, fonts embedded).
+    - Route List: 85 route aktif, terorganisir per role & middleware protection.
+
+27. **UI/UX Overhaul & PRD Demo Seeder**:
+    - **Sidebar Navigasi**: Menu Superadmin dan Juri dipindahkan dari top-navbar ke sidebar kiri dengan animasi collapse/expand mulus (width 256px → 80px) dan persistent via `localStorage`.
+    - **Top Bar**: Disederhanakan menampilkan tombol toggle sidebar, breadcrumb konteks, badge periode festival aktif, user avatar/profile, dan tombol logout di pojok kanan atas.
+    - **Main/Landing Page**: Redesain menyeluruh bernuansa civic-tech prestisius dengan hero section informatif, live KPI counter metrics, subcategory spotlight, dan kartu pilar tata kelola.
+    - **DemoSeeder Sesuai PRD**: Seeding 5 juri profesional, 39 instansi (OPD, Kelurahan, Puskesmas, Sekolah), 30 inovasi realistis, dan 2 subkategori berstatus `open` lengkap dengan matriks skor penilaian awal untuk demo live.
 
 - Seluruh alur fungsional inti aplikasi (Phase 1 s/d Phase 4) telah lengkap dan terverifikasi.
 
