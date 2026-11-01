@@ -44,13 +44,14 @@
     - Auth: `/login` (guest), `/logout` (auth).
     - Admin: `/admin` prefix, middleware `auth,role:superadmin`.
     - Jury: `/jury` prefix, middleware `auth,role:jury`.
-15. **Feature Tests** (76 tests total):
-    - `AuthenticationTest` (login, logout, validation, rate limiting, is_active check).
-    - `Admin/FestivalCrudTest` (list, create, edit, delete festivals + audit log).
-    - `Admin/MasterDataCrudTest` (CRUD institutions, innovations, users, assessment criteria).
-    - `PublicAccessTest` (guest access, authorization boundaries, public pages).
-    - **Semua test lulus** (76 passed, database schema tests included).
-16. **Audit Logs**: Implementasi `Services/Audit::log()` — mencatat actor, action, auditable (morph), changes (JSON), route integration di controllers.
+15. **Feature Tests** (57 feature & schema tests):
+    - `AuthenticationTest` (10 tests: login, logout, validation, rate limiting, is_active check).
+    - `Admin/FestivalCrudTest` (11 tests: list, create, edit, audit logs, auto-selection).
+    - `Admin/MasterDataCrudTest` (22 tests: CRUD festival categories, award categories, institutions, innovations, criteria, juries, policy guards).
+    - `PublicAccessTest` (11 tests: guest access, authorization boundaries, public pages with status visibility).
+    - `DatabaseSchemaTest` (3 tests: database structure and relationships baseline).
+    - **Hasil: 57 tests, 148 assertions — 100% PASSED** (0 failures, 0 errors).
+16. **Audit Logs**: Implementasi `App\Services\AuditService::log()` & `logChange()` — mencatat actor, action, auditable (morph), changes (JSON), terintegrasi penuh di controllers master data.
 
 
 ### Commit di GitHub

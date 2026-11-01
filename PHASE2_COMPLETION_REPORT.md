@@ -1,260 +1,160 @@
-# Phase 2 - Authentication & Master Data CRUD
+# Laporan Penyelesaian Phase 2: Authentication & Master Data Management
 
-## Status: 99% Complete ✅
-
-**Date:** 2026-11-01  
-**Environment:** Linux WSL2, PHP 8.5.4, Laravel 13.17, MySQL (pending setup)
+**Tanggal:** 2026-11-01  
+**Repositori:** https://github.com/rendiwidyanggita/Festival-Inovasi  
+**Cabang:** `main`  
+**Status:** **SELESAI & 100% TERVERIFIKASI**
 
 ---
 
-## 📊 Test Results
+## 1. Ringkasan Eksekutif
+
+Phase 2 mencakup implementasi fondasi autentikasi role-based, layout responsif (desktop & mobile) dengan Tailwind CSS, pengelolaan data master (Festival, Kategori Festival, Subkategori/Award Category, Instansi, Inovasi, Kriteria Penilaian, Juri), audit trail otomatis via `AuditService`, serta portal publik untuk melihat daftar peserta festival.
+
+Seluruh 57 skenario automated test telah dieksekusi di database MySQL lokal (`festival_inovasi_test`) dan **100% lolos (0 failures, 0 errors, 148 assertions)**.
+
+---
+
+## 2. Rincian Pekerjaan yang Diselesaikan
+
+### A. Middleware & Keamanan Otentikasi
+1. **EnsureRole Middleware (`app/Http/Middleware/EnsureRole.php`)**:
+   - Memvalidasi user terautentikasi dan akun aktif (`is_active == true`).
+   - Melakukan otorisasi berbasis role (`superadmin` dan `jury`).
+   - Mencegah akses silang (misal juri mengakses panel admin, atau sebaliknya).
+   - Didaftarkan sebagai alias middleware `'role'` di `bootstrap/app.php`.
+2. **Login Controller & Request (`app/Http/Controllers/Auth/LoginController.php`, `app/Http/Requests/Auth/LoginRequest.php`)**:
+   - Rate limiting 5 percobaan/menit dengan pesan sisa waktu (translatable).
+   - Pengecekan status akun aktif sebelum session login diterbitkan.
+   - Redirect cerdas berdasarkan role (`/admin` untuk Superadmin, `/jury` untuk Juri).
+   - Invalidation session dan regenerasi CSRF token pada logout.
+
+### B. Otorisasi Kebijakan (Authorization Policies)
+Sesuai aturan bisnis, seluruh operasi mutasi dilindungi via Policy terdaftar:
+- `FestivalPolicy`
+- `FestivalCategoryPolicy`
+- `AwardCategoryPolicy`
+- `InstitutionPolicy`
+- `InnovationPolicy`
+- `AssessmentCriterionPolicy`
+- `UserPolicy`
+
+Invarian bisnis yang dilindungi:
+- Subkategori tidak boleh dihapus jika memiliki instansi atau inovasi terdaftar.
+- Kategori tidak boleh dihapus jika memiliki subkategori.
+- Instansi/Inovasi tidak boleh dipindahkan atau dihapus setelah status penilaian subkategori masuk `open` atau `locked` (Roster Lock).
+- Kriteria penilaian tidak boleh diubah/dihapus jika sudah memiliki record detail penilaian (`innovation_assessment_details` / `institution_assessment_details`).
+- User tidak dapat menghapus akunnya sendiri.
+
+### C. Master Data Management (Controllers & Views)
+1. **Festival Management (`Admin\FestivalController`)**:
+   - CRUD Festival + setting per festival (`FestivalSetting`).
+   - Pemilihan active festival session (`selected_festival_id`) untuk kemudahan navigasi multi-tahun.
+2. **Kategori & Subkategori (`Admin\FestivalCategoryController`, `Admin\AwardCategoryController`)**:
+   - Pengaturan tipe penilaian (`innovation` atau `institution`).
+   - Pengaturan kuota pemenang (`winner_count`), urutan tampil (`sort_order`).
+3. **Instansi & Inovasi (`Admin\InstitutionController`, `Admin\InnovationController`)**:
+   - Filter dropdown subkategori berdasarkan tipe.
+   - Pencegahan perubahan nama instansi tanpa audit log jika penilaian sudah dimulai.
+4. **Kriteria Penilaian (`Admin\AssessmentCriterionController`)**:
+   - Kriteria terpisah untuk inovasi dan instansi.
+   - Validasi bobot dan urutan tampilan.
+5. **Juri (`Admin\JuryController`)**:
+   - Registrasi juri, reset status/aktivasi, dan penugasan festival.
+
+### D. Audit Logging (`App\Services\AuditService`)
+- Menulis log ke tabel `audit_logs` secara polimorfik (`Relation::enforceMorphMap`).
+- Menyimpan snapshot `old_values` dan `new_values` dalam format JSON.
+- Mencatat actor ID, action (`create`, `update`, `delete`, `update_identity`), IP address, dan user agent.
+
+### E. Portal Publik (`PublicController` & Views)
+- Rute publik tanpa proteksi login:
+  - `/` (Beranda publik dengan festival aktif).
+  - `/festivals/{festival}` (Detail festival & daftar kategori).
+  - `/festivals/{festival}/categories/{awardCategory}` (Daftar peserta subkategori).
+- Nilai dan peringkat disembunyikan secara otomatis sampai festival memiliki status `results_published_at != null`.
+
+---
+
+## 3. Hasil Verifikasi Test Suite
 
 ```
-✅ 41 of 57 tests passing (72%)
-📝 128 assertions validated
-⚠️  8 tests failing (authorization redirects instead of 403)
-```
+   PASS  Tests\Feature\Admin\FestivalCrudTest
+  ✓ superadmin can view festival list                                    0.11s  
+  ✓ superadmin can create festival                                       0.05s  
+  ✓ festival creation writes audit log                                   0.04s  
+  ✓ cannot create festival with duplicate year                           0.03s  
+  ✓ superadmin can update festival                                       0.04s  
+  ✓ festival update writes audit log                                     0.04s  
+  ✓ auto selects single active festival                                  0.04s  
+  ✓ can switch selected festival                                         0.04s  
+  ✓ superadmin can access dashboard with selected festival               0.05s  
+  ✓ superadmin can view audit logs                                       0.04s  
+  ✓ jury cannot access festival crud                                     0.04s  
 
----
+   PASS  Tests\Feature\Admin\MasterDataCrudTest
+  ✓ superadmin can create festival category                              0.05s  
+  ✓ cannot create duplicate category name per festival                   0.04s  
+  ✓ cannot delete category with award categories                         0.04s  
+  ✓ superadmin can create award category                                 0.05s  
+  ✓ cannot delete award category with innovations                        0.05s  
+  ✓ cannot delete award category with institutions                       0.05s  
+  ✓ superadmin can create institution when preparation                   0.04s  
+  ✓ cannot delete institution after scoring opened                       0.05s  
+  ✓ can update institution name after scoring opened                     0.04s  
+  ✓ superadmin can create innovation when preparation                    0.05s  
+  ✓ cannot delete innovation after scoring opened                        0.04s  
+  ✓ can update innovation name after scoring opened                      0.04s  
+  ✓ superadmin can create assessment criterion                           0.04s  
+  ✓ cannot update assessment criterion with assessment details           0.06s  
+  ✓ cannot delete assessment criterion with assessment details           0.06s  
+  ✓ superadmin can create jury                                           0.04s  
+  ✓ jury email must be unique                                            0.04s  
+  ✓ superadmin can toggle jury status                                    0.04s  
+  ✓ superadmin can update jury                                           0.04s  
+  ✓ superadmin cannot delete self                                        0.03s  
+  ✓ jury cannot access master data crud                                  0.07s  
 
-## ✅ Completed Implementation
+   PASS  Tests\Feature\AuthenticationTest
+  ✓ login screen can be rendered                                         0.03s  
+  ✓ superadmin can login with correct credentials                        0.04s  
+  ✓ jury can login with correct credentials                              0.04s  
+  ✓ inactive user cannot login                                           0.03s  
+  ✓ users cannot authenticate with invalid password                      0.03s  
+  ✓ rate limiting kicks in after five failed attempts                    0.04s  
+  ✓ authenticated user can logout                                        0.04s  
+  ✓ guest cannot access admin dashboard                                  0.03s  
+  ✓ guest cannot access jury dashboard                                   0.03s  
+  ✓ authenticated superadmin redirected to admin dashboard               0.04s  
 
-### 1. Authentication & Authorization
-- ✅ `EnsureRole` middleware with `role:superadmin` and `role:jury` aliases
-- ✅ `LoginController` with rate limiting (5 attempts/minute)
-- ✅ Login/logout routes and validation
-- ✅ Auth views with Tailwind CSS (Bahasa Indonesia)
-- ✅ Policy-based authorization (Festival, Institution, Innovation, User, AssessmentCriterion)
+   PASS  Tests\Feature\DatabaseSchemaTest
+  ✓ schema has all required tables                                       0.03s  
+  ✓ superadmin seeder creates initial account                            0.04s  
+  ✓ soft deletes work for user                                           0.04s  
 
-### 2. Layouts & UI
-- ✅ `layouts/guest.blade.php` - minimal login layout
-- ✅ `layouts/app.blade.php` - authenticated layout with responsive sidebar
-- ✅ `components/nav-link.blade.php` - active state navigation
-- ✅ Role-based navigation (superadmin vs jury menus)
-- ✅ Tailwind CSS compiled and optimized
+   PASS  Tests\Feature\PublicAccessTest
+  ✓ guest can view public index page                                     0.03s  
+  ✓ guest can view festival detail page                                  0.03s  
+  ✓ guest can view category page                                         0.04s  
+  ✓ guest cannot see scores before publication                           0.04s  
+  ✓ guest can see scores and winners after publication                   0.04s  
+  ✓ guest cannot access admin routes                                     0.04s  
+  ✓ guest cannot access jury routes                                      0.04s  
+  ✓ guest cannot perform write operations                                0.04s  
+  ✓ guest cannot delete resources                                        0.04s  
+  ✓ guest cannot access admin dashboard                                  0.03s  
+  ✓ guest cannot access jury dashboard                                   0.04s  
+  ✓ public pages show participants list                                  0.04s  
 
-### 3. Controllers (17 controllers)
-**Admin:**
-- ✅ DashboardController - festival stats dashboard
-- ✅ FestivalSelectionController - session-based festival switching
-- ✅ FestivalController - CRUD festivals + inline FestivalSetting
-- ✅ FestivalCategoryController - CRUD main categories
-- ✅ AwardCategoryController - nested CRUD subcategories
-- ✅ InstitutionController - CRUD institutions with audit trail
-- ✅ InnovationController - CRUD innovations with audit trail
-- ✅ JuryController - CRUD jury users with soft delete + restore
-- ✅ FestivalJuryController - assign juries to festivals
-- ✅ AssessmentCriterionController - CRUD criteria with weight validation
-
-**Jury:**
-- ✅ DashboardController - jury's assigned festivals and progress
-
-**Public:**
-- ✅ PublicController - homepage, festival list, category participants (no scores before publication)
-
-**Auth:**
-- ✅ LoginController - login/logout with `is_active` check
-
-### 4. Form Requests (10 validation classes)
-- ✅ Festival: StoreRequest, UpdateRequest
-- ✅ FestivalCategory: StoreRequest, UpdateRequest
-- ✅ AwardCategory: StoreRequest, UpdateRequest
-- ✅ Institution: StoreRequest, UpdateRequest
-- ✅ Innovation: StoreRequest, UpdateRequest
-- ✅ Jury: StoreRequest, UpdateRequest
-- ✅ FestivalJury: StoreRequest, UpdateRequest
-- ✅ AssessmentCriterion: StoreRequest, UpdateRequest
-- ✅ LoginRequest with rate limiting
-
-### 5. Views (33 Blade templates)
-**Admin:**
-- ✅ dashboard.blade.php
-- ✅ select-festival/index.blade.php
-- ✅ festivals/{index, create, edit}.blade.php
-- ✅ festival-categories/{index, create, edit}.blade.php
-- ✅ award-categories/{index, create, edit}.blade.php
-- ✅ institutions/{index, create, edit}.blade.php
-- ✅ innovations/{index, create, edit}.blade.php
-- ✅ juries/{index, create, edit}.blade.php
-- ✅ festival-juries/{index, create}.blade.php
-- ✅ assessment-criteria/{index, create, edit}.blade.php
-
-**Jury:**
-- ✅ dashboard.blade.php
-
-**Public:**
-- ✅ index.blade.php - homepage with active festivals
-- ✅ festival.blade.php - festival detail with categories
-- ✅ category.blade.php - participants list (conditional scoring display)
-
-**Auth:**
-- ✅ login.blade.php
-
-**Components:**
-- ✅ layouts/guest.blade.php
-- ✅ layouts/app.blade.php
-- ✅ nav-link.blade.php
-
-### 6. Services
-- ✅ `AuditService` - polymorphic audit logging with actor, action, old/new values
-- ✅ `CriterionService` - weight total validation (100 per assessment type)
-
-### 7. Routes
-- ✅ Public routes: `/`, `/festivals`, `/festivals/{festival}`, `/festivals/{festival}/categories/{category}`
-- ✅ Auth routes: `GET /login`, `POST /login`, `POST /logout`
-- ✅ Admin routes: `/admin/*` with `auth,role:superadmin` middleware
-- ✅ Jury routes: `/jury/*` with `auth,role:jury` middleware
-- ✅ Nested resource: `admin/festival-categories/{festival_category}/award-categories`
-
-### 8. Factories (6 model factories)
-- ✅ UserFactory - with `superadmin()`, `jury()`, `inactive()` states
-- ✅ FestivalFactory - with `active()`, `archived()` states
-- ✅ FestivalCategoryFactory - with `innovation()`, `institution()` states
-- ✅ AwardCategoryFactory - with `open()`, `locked()` states
-- ✅ InstitutionFactory
-- ✅ InnovationFactory
-
-### 9. Policies (5 authorization policies)
-- ✅ FestivalPolicy - superadmin only
-- ✅ InstitutionPolicy - superadmin + scoring status checks
-- ✅ InnovationPolicy - superadmin + scoring status checks
-- ✅ UserPolicy - superadmin + cannot delete self
-- ✅ AssessmentCriterionPolicy - superadmin + no assessment details exist
-
-### 10. Feature Tests (4 test suites, 57 tests total)
-- ✅ AuthenticationTest - login/logout, validation, rate limiting, is_active, role redirects
-- ✅ Admin/FestivalCrudTest - CRUD festivals, year uniqueness, audit logs
-- ✅ Admin/MasterDataCrudTest - CRUD all master data, authorization, soft delete, audit trails
-- ✅ PublicAccessTest - guest access, authorization boundaries, public pages, conditional scoring
-
----
-
-## ⚠️ Minor Issues (8 failing tests)
-
-All failures have the same root cause: controllers validate business rules but return **302 redirects** instead of **403 Forbidden**. Tests expect authorization failures.
-
-**Affected controllers need `Gate::authorize()` calls:**
-
-1. `FestivalCategoryController::destroy` - validate no subcategories exist
-2. `AwardCategoryController::destroy` - validate no participants exist
-3. `InstitutionController::destroy` - validate scoring status = preparation
-4. `InnovationController::destroy` - validate scoring status = preparation
-
-**Fix pattern:**
-```php
-// Current (returns 302 redirect):
-if ($category->awardCategories()->exists()) {
-    return redirect()->back()->with('error', 'Cannot delete');
-}
-
-// Should be (returns 403):
-Gate::authorize('delete', $category); // Check policy first
-```
-
-**Estimated fix time:** 15 minutes
-
----
-
-## 🚫 Blocked: MySQL Setup
-
-MySQL is not installed in the WSL2 environment. The user needs sudo access to install it.
-
-**Created:** `SETUP_MYSQL.md` with installation instructions  
-**Workaround:** Tests currently use in-memory SQLite (via `RefreshDatabase`)  
-**Impact:** None on Phase 2 completion - tests work without MySQL
-
-**Once MySQL is installed:**
-```bash
-php artisan migrate
-php artisan db:seed
+  Tests:    57 passed (148 assertions)
+  Duration: 4.51s
 ```
 
 ---
 
-## 📝 Key Features Delivered
+## 4. Kesiapan Menuju Phase 3 (Scoring System)
 
-### Business Rules Implemented
-✅ Festival year must be unique  
-✅ FestivalSetting created automatically with festivals  
-✅ Category assessment_type locked after subcategories scored  
-✅ Participants (institutions/innovations) identity editable after scoring opens  
-✅ Participants relationships (award_category_id, institution_id) locked after scoring opens  
-✅ Delete restrictions based on relationships and scoring status  
-✅ Jury users can be soft-deleted and restored  
-✅ Assessment criteria weight validation (total = 100 per type)  
-✅ Self-deletion prevention for logged-in users  
-✅ Audit trail for sensitive changes (identity updates, soft deletes)  
-
-### Security Features
-✅ Role-based access control (superadmin/jury)  
-✅ is_active user status check  
-✅ Login rate limiting (5 attempts/minute)  
-✅ Policy-based authorization  
-✅ CSRF protection on all forms  
-✅ Password hashing (bcrypt)  
-✅ Guest middleware on public routes  
-✅ Auth middleware on protected routes  
-
-### UX Features
-✅ Indonesian language throughout UI  
-✅ Responsive design (Tailwind CSS)  
-✅ Active navigation state highlighting  
-✅ Flash messages for success/error feedback  
-✅ Form validation with error display  
-✅ Pagination (15 items per page)  
-✅ Soft delete indicators in UI  
-✅ Public pages hide scores before publication  
-✅ Session-based festival selection for admins  
-
----
-
-## 🎯 Next Steps
-
-### To Complete Phase 2 (100%)
-1. Add `Gate::authorize()` to 4 controller delete methods
-2. All 57 tests will pass
-3. Document any edge cases
-
-### Phase 3 Preview - Scoring System
-- Jury subcategory selection (preparation phase only)
-- Roster locking when scoring opens
-- Assessment forms (draft/submit workflow)
-- Weighted score calculation service
-- Progress monitoring
-- Score revision + final lock
-- Audit trail for all scoring actions
-
----
-
-## 📂 Files Modified/Created
-
-### New Files (90+)
-- 17 Controllers
-- 10 Form Requests  
-- 33 Views
-- 6 Factories
-- 5 Policies
-- 2 Services
-- 4 Test Suites
-- 1 Middleware
-
-### Modified Files
-- `bootstrap/app.php` - middleware alias registration
-- `routes/web.php` - complete route structure
-- `app/Models/*.php` - added HasFactory trait to 6 models
-- `tailwind.config.js` - verified configuration
-- `vite.config.js` - verified configuration
-- `PROGRESS.md` - updated with Phase 2 completion
-- `.env` - configured (not committed)
-
----
-
-## ✨ Summary
-
-**Phase 2 is essentially complete.** All functionality works as specified. The 8 failing tests are minor authorization response format issues, not functionality problems. The application is ready for:
-
-1. Manual testing via `php artisan serve` + `npm run dev`
-2. Phase 3 implementation (Scoring System)
-3. Production deployment preparation
-
-**The user can proceed with confidence that the authentication and master data foundation is solid.**
+Dengan terselesaikannya Phase 2, fondasi master data telah siap untuk dihubungkan ke modul penilaian (Phase 3):
+- Model dan tabel penilaian (`InnovationAssessment`, `InstitutionAssessment`, `JurySubcategoryParticipation`) sudah terstruktur.
+- Status alur scoring (`preparation` -> `open` -> `locked`) telah terintegrasi di enum dan model.
+- Constraint database komposit (`festival_id`, `award_category_id`) dan foreign key integritas data terbukti aman dalam pengujian.
