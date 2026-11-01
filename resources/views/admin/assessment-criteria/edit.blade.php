@@ -1,0 +1,71 @@
+<x-layouts.app>
+    <x-slot name="header">
+        Edit Kriteria: {{ $criterion->name }}
+    </x-slot>
+
+    <div class="bg-white overflow-hidden shadow-sm rounded-lg">
+        <div class="p-6">
+            <form method="POST" action="{{ route('admin.assessment-criteria.update', $criterion) }}">
+                @csrf
+                @method('PUT')
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- Tipe Penilaian -->
+                    <div>
+                        <label for="assessment_type" class="block text-sm font-medium text-gray-700">Tipe Penilaian</label>
+                        <div class="mt-1 block w-full rounded-md border-gray-200 bg-gray-50 px-3 py-2 text-gray-500">
+                            {{ $criterion->assessment_type->label() }}
+                        </div>
+                        <p class="mt-2 text-sm text-gray-500">Tipe penilaian tidak dapat diubah.</p>
+                    </div>
+                    
+                    <!-- Nama Kriteria -->
+                    <div>
+                        <label for="name" class="block text-sm font-medium text-gray-700">Nama Kriteria <span class="text-red-500">*</span></label>
+                        <input type="text" name="name" id="name" value="{{ old('name', $criterion->name) }}" 
+                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 @error('name') border-red-500 @enderror" 
+                            required>
+                        @error('name')
+                            <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
+                        @enderror
+                    </div>
+                    
+                    <!-- Bobot -->
+                    <div>
+                        <label for="weight" class="block text-sm font-medium text-gray-700">Bobot (%) <span class="text-red-500">*</span></label>
+                        <input type="number" name="weight" id="weight" value="{{ old('weight', $criterion->weight) }}" min="1" max="100" 
+                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 @error('weight') border-red-500 @enderror" 
+                            required>
+                        @error('weight')
+                            <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
+                        @enderror
+                    </div>
+                    
+                    <!-- Urutan -->
+                    <div>
+                        <label for="sort_order" class="block text-sm font-medium text-gray-700">Urutan</label>
+                        <input type="number" name="sort_order" id="sort_order" value="{{ old('sort_order', $criterion->sort_order) }}" 
+                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                    </div>
+                </div>
+                
+                @if($criterion->innovationAssessmentDetails()->exists() || $criterion->institutionAssessmentDetails()->exists())
+                    <div class="mt-4 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+                        <p class="text-sm text-yellow-800">
+                            Kriteria ini sudah digunakan dalam penilaian. Perubahan dapat mempengaruhi hasil penilaian yang sudah ada.
+                        </p>
+                    </div>
+                @endif
+                
+                <div class="mt-6 flex items-center gap-4">
+                    <button type="submit" class="inline-flex items-center px-4 py-2 bg-blue-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-blue-700">
+                        Simpan
+                    </button>
+                    <a href="{{ route('admin.assessment-criteria.index') }}" class="inline-flex items-center px-4 py-2 bg-gray-200 border border-transparent rounded-md font-semibold text-xs text-gray-700 uppercase tracking-widest hover:bg-gray-300">
+                        Batal
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+</x-layouts.app>
