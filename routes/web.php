@@ -23,7 +23,7 @@ Route::middleware('guest')->group(function () {
 Route::post('logout', [LoginController::class, 'logout'])->middleware('auth')->name('logout');
 
 // Admin routes
-Route::middleware(['auth', 'role:superadmin'])->prefix('admin')->name('admin.')->group(function () {
+Route::middleware(['auth', 'role:superadmin', 'festival'])->prefix('admin')->name('admin.')->group(function () {
     Route::get('/', Admin\DashboardController::class)->name('dashboard');
     
     // Festival selection
@@ -31,7 +31,7 @@ Route::middleware(['auth', 'role:superadmin'])->prefix('admin')->name('admin.')-
     Route::post('/select-festival/{festival}', [Admin\FestivalSelectionController::class, 'select'])->name('select-festival.select');
     
     // Festivals
-    Route::resource('festivals', Admin\FestivalController::class)->except(['destroy']);
+    Route::resource('festivals', Admin\FestivalController::class);
     
     // Festival Categories
     Route::resource('festival-categories', Admin\FestivalCategoryController::class)->except(['show']);
@@ -40,6 +40,11 @@ Route::middleware(['auth', 'role:superadmin'])->prefix('admin')->name('admin.')-
     Route::resource('festival-categories.award-categories', Admin\AwardCategoryController::class)
         ->except(['show'])
         ->shallow();
+    
+    // Route aliases for backward compatibility and clean view routing
+    Route::get('festival-categories/{festival_category}/subkategori', [Admin\AwardCategoryController::class, 'index'])->name('award-categories.index');
+    Route::get('festival-categories/{festival_category}/subkategori/create', [Admin\AwardCategoryController::class, 'create'])->name('award-categories.create');
+    Route::post('festival-categories/{festival_category}/subkategori', [Admin\AwardCategoryController::class, 'store'])->name('award-categories.store');
     
     // Institutions
     Route::resource('institutions', Admin\InstitutionController::class)->except(['show']);

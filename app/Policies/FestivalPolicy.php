@@ -39,4 +39,12 @@ class FestivalPolicy
     {
         return $user->isSuperadmin();
     }
+
+    /**
+     * Determine whether the user can delete the model.
+     */
+    public function delete(User $user, Festival $festival): bool
+    {
+        return $user->isSuperadmin();
+    }
 }
