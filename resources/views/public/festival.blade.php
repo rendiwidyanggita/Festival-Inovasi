@@ -7,18 +7,28 @@
     <title>{{ $festival->name }} - Festival Inovasi</title>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
-<body class="font-sans antialiased bg-gray-50 min-h-screen">
+<body class="font-sans antialiased bg-slate-50 min-h-screen">
     <!-- Navigation -->
-    <nav class="bg-white shadow-lg">
+    <nav class="bg-white shadow-sm border-b border-slate-200">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between h-16">
                 <div class="flex items-center">
-                    <a href="{{ route('home') }}" class="text-2xl font-bold text-blue-800">Festival Inovasi</a>
+                    <a href="{{ route('home') }}" class="text-2xl font-bold text-blue-600 hover:text-blue-700 transition-colors">Festival Inovasi</a>
                 </div>
                 <div class="flex items-center space-x-4">
-                    <a href="{{ route('login') }}" class="text-blue-600 hover:text-blue-900 font-medium">
-                        Masuk
-                    </a>
+                    @auth
+                        <a href="{{ auth()->user()->isSuperadmin() ? route('admin.dashboard') : route('jury.dashboard') }}" class="text-blue-600 hover:text-blue-700 font-medium transition-colors">
+                            Dashboard
+                        </a>
+                        <form method="POST" action="{{ route('logout') }}" class="inline">
+                            @csrf
+                            <button type="submit" class="text-slate-600 hover:text-red-600 font-medium transition-colors">Keluar</button>
+                        </form>
+                    @else
+                        <a href="{{ route('login') }}" class="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold bg-blue-600 text-white hover:bg-blue-700 shadow-md shadow-blue-600/20 transition-all">
+                            Masuk Portal
+                        </a>
+                    @endauth
                 </div>
             </div>
         </div>

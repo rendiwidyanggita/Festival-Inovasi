@@ -1,106 +1,532 @@
 <!DOCTYPE html>
-<html lang="id">
+<html lang="id" class="h-full bg-slate-50">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>{{ $header ?? config('app.name') }}</title>
+    <title>{{ $header ?? config('app.name', 'Festival Inovasi') }} - Festival Inovasi</title>
     <link rel="icon" type="image/svg+xml" href="{{ asset('favicon.svg') }}">
     @vite(['resources/css/app.css', 'resources/js/app.js'])
+
+    <style>
+        /* Smooth transitions for sidebar */
+        #app-sidebar {
+            transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .sidebar-transition-element {
+            transition: opacity 0.2s ease, transform 0.2s ease, width 0.3s ease;
+        }
+        
+        /* Collapsed Sidebar Styles */
+        body.sidebar-collapsed #app-sidebar {
+            width: 5rem !important; /* 80px */
+        }
+        body.sidebar-collapsed .sidebar-label {
+            opacity: 0;
+            width: 0;
+            display: none;
+        }
+        body.sidebar-collapsed .sidebar-section-header {
+            opacity: 0;
+            height: 0;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+        }
+        body.sidebar-collapsed .sidebar-brand-text {
+            display: none;
+        }
+        body.sidebar-collapsed .sidebar-brand-icon {
+            margin: 0 auto;
+        }
+        body.sidebar-collapsed .nav-item-link {
+            justify-content: center;
+            padding-left: 0.75rem;
+            padding-right: 0.75rem;
+        }
+        body.sidebar-collapsed .sidebar-collapse-text {
+            display: none;
+        }
+        body.sidebar-collapsed .sidebar-collapse-btn {
+            justify-content: center;
+        }
+        body.sidebar-collapsed .sidebar-collapse-icon {
+            transform: rotate(180deg);
+        }
+        body.sidebar-collapsed .tooltip-when-collapsed {
+            opacity: 0;
+            pointer-events: none;
+        }
+        body.sidebar-collapsed .group:hover .tooltip-when-collapsed {
+            opacity: 1;
+        }
+    </style>
+
+    <script>
+        // Apply saved collapse state before rendering to prevent visual flicker (FOUC)
+        (function() {
+            try {
+                if (localStorage.getItem('fi_sidebar_collapsed') === 'true') {
+                    document.documentElement.classList.add('sidebar-init-collapsed');
+                    document.addEventListener('DOMContentLoaded', function() {
+                        document.body.classList.add('sidebar-collapsed');
+                    });
+                }
+            } catch (e) {}
+        })();
+    </script>
 </head>
-<body class="font-sans antialiased bg-gray-100">
-    <div class="min-h-screen">
-        <!-- Navigation -->
-        <nav class="bg-blue-800 shadow-lg">
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div class="flex justify-between h-16">
-                    <div class="flex">
-                        <div class="flex-shrink-0 flex items-center">
-                            <span class="text-white text-xl font-bold">Festival Inovasi</span>
+<body class="h-full font-sans antialiased text-slate-800 bg-slate-50 flex flex-col">
+
+    <div class="flex h-screen overflow-hidden bg-slate-50">
+
+        <!-- Mobile Backdrop Overlay -->
+        <div id="mobile-sidebar-backdrop" 
+             onclick="toggleMobileSidebar()" 
+             class="fixed inset-0 bg-slate-950/70 backdrop-blur-sm z-40 hidden lg:hidden transition-opacity duration-300 opacity-0"></div>
+
+        <!-- ========================================================= -->
+        <!-- SIDEBAR -->
+        <!-- ========================================================= -->
+        <aside id="app-sidebar" 
+               class="fixed inset-y-0 left-0 z-50 w-64 bg-slate-950 border-r border-slate-800 flex flex-col justify-between transform -translate-x-full lg:translate-x-0 lg:static transition-all duration-300 ease-in-out shrink-0 select-none shadow-2xl lg:shadow-none">
+            
+            <!-- Top: Brand Header -->
+            <div>
+                <div class="h-16 flex items-center px-4 border-b border-slate-800/80 bg-slate-950/60 justify-between">
+                    <a href="{{ auth()->user()->isSuperadmin() ? route('admin.dashboard') : route('jury.dashboard') }}" 
+                       class="flex items-center gap-3 group overflow-hidden">
+                        <div class="sidebar-brand-icon w-9 h-9 rounded-xl bg-gradient-to-tr from-blue-600 to-indigo-500 flex items-center justify-center text-white shadow-md shadow-blue-500/20 shrink-0">
+                            <svg class="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                            </svg>
                         </div>
-                        <div class="hidden sm:ml-6 sm:flex sm:space-x-4">
-                            @if(auth()->user()->isSuperadmin())
-                                <x-nav-link :href="route('admin.dashboard')" :active="request()->routeIs('admin.dashboard')">
-                                    Dashboard
-                                </x-nav-link>
-                                <x-nav-link :href="route('admin.festivals.index')" :active="request()->routeIs('admin.festivals.*')">
-                                    Festival
-                                </x-nav-link>
-                                <x-nav-link :href="route('admin.festival-categories.index')" :active="request()->routeIs('admin.festival-categories.*') || request()->routeIs('admin.award-categories.*')">
-                                    Kategori
-                                </x-nav-link>
-                                <x-nav-link :href="route('admin.institutions.index')" :active="request()->routeIs('admin.institutions.*')">
-                                    Instansi
-                                </x-nav-link>
-                                <x-nav-link :href="route('admin.innovations.index')" :active="request()->routeIs('admin.innovations.*')">
-                                    Inovasi
-                                </x-nav-link>
-                                <x-nav-link :href="route('admin.juries.index')" :active="request()->routeIs('admin.juries.*') || request()->routeIs('admin.festival-juries.*')">
-                                    Juri
-                                </x-nav-link>
-                                <x-nav-link :href="route('admin.assessment-criteria.index')" :active="request()->routeIs('admin.assessment-criteria.*')">
-                                    Kriteria
-                                </x-nav-link>
-                            @elseif(auth()->user()->isJury())
-                                <x-nav-link :href="route('jury.dashboard')" :active="request()->routeIs('jury.dashboard')">
-                                    Dashboard
-                                </x-nav-link>
-                            @endif
-                        </div>
-                    </div>
-                    <div class="flex items-center">
-                        <div class="flex items-center space-x-4">
-                            <span class="text-gray-200 text-sm">
-                                {{ auth()->user()->name }} 
-                                <span class="text-gray-400">({{ auth()->user()->role->label() }})</span>
+                        <div class="sidebar-brand-text truncate">
+                            <span class="text-base font-bold text-white tracking-tight group-hover:text-blue-400 transition-colors">
+                                Festival Inovasi
                             </span>
+                            <span class="block text-[10px] uppercase font-semibold tracking-wider text-slate-500">
+                                {{ auth()->user()->isSuperadmin() ? 'Super Admin Portal' : 'Juri Portal' }}
+                            </span>
+                        </div>
+                    </a>
+
+                    <!-- Close button on Mobile only -->
+                    <button type="button" onclick="toggleMobileSidebar()" class="lg:hidden text-slate-400 hover:text-white p-1.5 rounded-lg hover:bg-slate-800">
+                        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                    </button>
+                </div>
+
+                <!-- Navigation Links List -->
+                <nav class="p-3 space-y-6 overflow-y-auto max-h-[calc(100vh-8.5rem)] scrollbar-thin scrollbar-thumb-slate-800">
+                    
+                    @if(auth()->user()->isSuperadmin())
+                        <!-- Section: UTAMA -->
+                        <div>
+                            <div class="sidebar-section-header px-3 mb-2 text-[10px] font-bold uppercase tracking-wider text-slate-500 sidebar-transition-element">
+                                Menu Utama
+                            </div>
+                            <div class="space-y-1">
+                                <!-- Dashboard -->
+                                <div class="relative group">
+                                    <a href="{{ route('admin.dashboard') }}" 
+                                       class="nav-item-link flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-150 {{ request()->routeIs('admin.dashboard') ? 'bg-blue-600 text-white font-semibold shadow-md shadow-blue-600/30' : 'text-slate-400 hover:text-slate-100 hover:bg-slate-900' }}">
+                                        <svg class="w-5 h-5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+                                        </svg>
+                                        <span class="sidebar-label truncate">Dashboard</span>
+                                    </a>
+                                    <span class="tooltip-when-collapsed absolute left-full ml-2 top-1/2 -translate-y-1/2 px-2.5 py-1.5 bg-slate-900 text-white text-xs font-semibold rounded-lg shadow-xl z-50 pointer-events-none border border-slate-700 whitespace-nowrap opacity-0 transition-opacity duration-150">
+                                        Dashboard
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Section: MASTER DATA -->
+                        <div>
+                            <div class="sidebar-section-header px-3 mb-2 text-[10px] font-bold uppercase tracking-wider text-slate-500 sidebar-transition-element">
+                                Master Data
+                            </div>
+                            <div class="space-y-1">
+                                <!-- Festival -->
+                                <div class="relative group">
+                                    <a href="{{ route('admin.festivals.index') }}" 
+                                       class="nav-item-link flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-150 {{ request()->routeIs('admin.festivals.*') ? 'bg-blue-600 text-white font-semibold shadow-md shadow-blue-600/30' : 'text-slate-400 hover:text-slate-100 hover:bg-slate-900' }}">
+                                        <svg class="w-5 h-5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                        </svg>
+                                        <span class="sidebar-label truncate">Festival</span>
+                                    </a>
+                                    <span class="tooltip-when-collapsed absolute left-full ml-2 top-1/2 -translate-y-1/2 px-2.5 py-1.5 bg-slate-900 text-white text-xs font-semibold rounded-lg shadow-xl z-50 pointer-events-none border border-slate-700 whitespace-nowrap opacity-0 transition-opacity duration-150">
+                                        Festival
+                                    </span>
+                                </div>
+
+                                <!-- Kategori & Subkategori -->
+                                <div class="relative group">
+                                    <a href="{{ route('admin.festival-categories.index') }}" 
+                                       class="nav-item-link flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-150 {{ (request()->routeIs('admin.festival-categories.*') || request()->routeIs('admin.award-categories.*')) ? 'bg-blue-600 text-white font-semibold shadow-md shadow-blue-600/30' : 'text-slate-400 hover:text-slate-100 hover:bg-slate-900' }}">
+                                        <svg class="w-5 h-5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+                                        </svg>
+                                        <span class="sidebar-label truncate">Kategori & Subkategori</span>
+                                    </a>
+                                    <span class="tooltip-when-collapsed absolute left-full ml-2 top-1/2 -translate-y-1/2 px-2.5 py-1.5 bg-slate-900 text-white text-xs font-semibold rounded-lg shadow-xl z-50 pointer-events-none border border-slate-700 whitespace-nowrap opacity-0 transition-opacity duration-150">
+                                        Kategori & Subkategori
+                                    </span>
+                                </div>
+
+                                <!-- Instansi -->
+                                <div class="relative group">
+                                    <a href="{{ route('admin.institutions.index') }}" 
+                                       class="nav-item-link flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-150 {{ request()->routeIs('admin.institutions.*') ? 'bg-blue-600 text-white font-semibold shadow-md shadow-blue-600/30' : 'text-slate-400 hover:text-slate-100 hover:bg-slate-900' }}">
+                                        <svg class="w-5 h-5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                                        </svg>
+                                        <span class="sidebar-label truncate">Instansi</span>
+                                    </a>
+                                    <span class="tooltip-when-collapsed absolute left-full ml-2 top-1/2 -translate-y-1/2 px-2.5 py-1.5 bg-slate-900 text-white text-xs font-semibold rounded-lg shadow-xl z-50 pointer-events-none border border-slate-700 whitespace-nowrap opacity-0 transition-opacity duration-150">
+                                        Instansi
+                                    </span>
+                                </div>
+
+                                <!-- Inovasi -->
+                                <div class="relative group">
+                                    <a href="{{ route('admin.innovations.index') }}" 
+                                       class="nav-item-link flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-150 {{ request()->routeIs('admin.innovations.*') ? 'bg-blue-600 text-white font-semibold shadow-md shadow-blue-600/30' : 'text-slate-400 hover:text-slate-100 hover:bg-slate-900' }}">
+                                        <svg class="w-5 h-5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+                                        </svg>
+                                        <span class="sidebar-label truncate">Inovasi</span>
+                                    </a>
+                                    <span class="tooltip-when-collapsed absolute left-full ml-2 top-1/2 -translate-y-1/2 px-2.5 py-1.5 bg-slate-900 text-white text-xs font-semibold rounded-lg shadow-xl z-50 pointer-events-none border border-slate-700 whitespace-nowrap opacity-0 transition-opacity duration-150">
+                                        Inovasi
+                                    </span>
+                                </div>
+
+                                <!-- Akun Juri -->
+                                <div class="relative group">
+                                    <a href="{{ route('admin.juries.index') }}" 
+                                       class="nav-item-link flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-150 {{ request()->routeIs('admin.juries.*') ? 'bg-blue-600 text-white font-semibold shadow-md shadow-blue-600/30' : 'text-slate-400 hover:text-slate-100 hover:bg-slate-900' }}">
+                                        <svg class="w-5 h-5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+                                        </svg>
+                                        <span class="sidebar-label truncate">Kelola Akun Juri</span>
+                                    </a>
+                                    <span class="tooltip-when-collapsed absolute left-full ml-2 top-1/2 -translate-y-1/2 px-2.5 py-1.5 bg-slate-900 text-white text-xs font-semibold rounded-lg shadow-xl z-50 pointer-events-none border border-slate-700 whitespace-nowrap opacity-0 transition-opacity duration-150">
+                                        Kelola Akun Juri
+                                    </span>
+                                </div>
+
+                                <!-- Kriteria Penilaian -->
+                                <div class="relative group">
+                                    <a href="{{ route('admin.assessment-criteria.index') }}" 
+                                       class="nav-item-link flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-150 {{ request()->routeIs('admin.assessment-criteria.*') ? 'bg-blue-600 text-white font-semibold shadow-md shadow-blue-600/30' : 'text-slate-400 hover:text-slate-100 hover:bg-slate-900' }}">
+                                        <svg class="w-5 h-5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
+                                        </svg>
+                                        <span class="sidebar-label truncate">Kriteria & Bobot</span>
+                                    </a>
+                                    <span class="tooltip-when-collapsed absolute left-full ml-2 top-1/2 -translate-y-1/2 px-2.5 py-1.5 bg-slate-900 text-white text-xs font-semibold rounded-lg shadow-xl z-50 pointer-events-none border border-slate-700 whitespace-nowrap opacity-0 transition-opacity duration-150">
+                                        Kriteria & Bobot
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Section: PENILAIAN & LAPORAN -->
+                        <div>
+                            <div class="sidebar-section-header px-3 mb-2 text-[10px] font-bold uppercase tracking-wider text-slate-500 sidebar-transition-element">
+                                Penilaian & Hasil
+                            </div>
+                            <div class="space-y-1">
+                                <!-- Penugasan Juri -->
+                                <div class="relative group">
+                                    <a href="{{ route('admin.festival-juries.index') }}" 
+                                       class="nav-item-link flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-150 {{ request()->routeIs('admin.festival-juries.*') ? 'bg-blue-600 text-white font-semibold shadow-md shadow-blue-600/30' : 'text-slate-400 hover:text-slate-100 hover:bg-slate-900' }}">
+                                        <svg class="w-5 h-5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" />
+                                        </svg>
+                                        <span class="sidebar-label truncate">Penugasan Juri</span>
+                                    </a>
+                                    <span class="tooltip-when-collapsed absolute left-full ml-2 top-1/2 -translate-y-1/2 px-2.5 py-1.5 bg-slate-900 text-white text-xs font-semibold rounded-lg shadow-xl z-50 pointer-events-none border border-slate-700 whitespace-nowrap opacity-0 transition-opacity duration-150">
+                                        Penugasan Juri
+                                    </span>
+                                </div>
+
+                                <!-- Monitoring Penilaian -->
+                                <div class="relative group">
+                                    <a href="{{ route('admin.scoring.monitoring') }}" 
+                                       class="nav-item-link flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-150 {{ request()->routeIs('admin.scoring.*') ? 'bg-blue-600 text-white font-semibold shadow-md shadow-blue-600/30' : 'text-slate-400 hover:text-slate-100 hover:bg-slate-900' }}">
+                                        <svg class="w-5 h-5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                                        </svg>
+                                        <span class="sidebar-label truncate">Monitoring Nilai</span>
+                                    </a>
+                                    <span class="tooltip-when-collapsed absolute left-full ml-2 top-1/2 -translate-y-1/2 px-2.5 py-1.5 bg-slate-900 text-white text-xs font-semibold rounded-lg shadow-xl z-50 pointer-events-none border border-slate-700 whitespace-nowrap opacity-0 transition-opacity duration-150">
+                                        Monitoring Nilai
+                                    </span>
+                                </div>
+
+                                <!-- Pemenang -->
+                                <div class="relative group">
+                                    <a href="{{ route('admin.winners.index') }}" 
+                                       class="nav-item-link flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-150 {{ (request()->routeIs('admin.winners.*') || request()->routeIs('admin.award-categories.rankings')) ? 'bg-blue-600 text-white font-semibold shadow-md shadow-blue-600/30' : 'text-slate-400 hover:text-slate-100 hover:bg-slate-900' }}">
+                                        <svg class="w-5 h-5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
+                                        </svg>
+                                        <span class="sidebar-label truncate">Penetapan Pemenang</span>
+                                    </a>
+                                    <span class="tooltip-when-collapsed absolute left-full ml-2 top-1/2 -translate-y-1/2 px-2.5 py-1.5 bg-slate-900 text-white text-xs font-semibold rounded-lg shadow-xl z-50 pointer-events-none border border-slate-700 whitespace-nowrap opacity-0 transition-opacity duration-150">
+                                        Penetapan Pemenang
+                                    </span>
+                                </div>
+
+                                <!-- Laporan PDF -->
+                                <div class="relative group">
+                                    <a href="{{ route('admin.reports.index') }}" 
+                                       class="nav-item-link flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-150 {{ request()->routeIs('admin.reports.*') ? 'bg-blue-600 text-white font-semibold shadow-md shadow-blue-600/30' : 'text-slate-400 hover:text-slate-100 hover:bg-slate-900' }}">
+                                        <svg class="w-5 h-5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
+                                        </svg>
+                                        <span class="sidebar-label truncate">Laporan & Publikasi</span>
+                                    </a>
+                                    <span class="tooltip-when-collapsed absolute left-full ml-2 top-1/2 -translate-y-1/2 px-2.5 py-1.5 bg-slate-900 text-white text-xs font-semibold rounded-lg shadow-xl z-50 pointer-events-none border border-slate-700 whitespace-nowrap opacity-0 transition-opacity duration-150">
+                                        Laporan & Publikasi
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+
+                    @elseif(auth()->user()->isJury())
+                        <!-- Section: MENU JURI -->
+                        <div>
+                            <div class="sidebar-section-header px-3 mb-2 text-[10px] font-bold uppercase tracking-wider text-slate-500 sidebar-transition-element">
+                                Penilaian Juri
+                            </div>
+                            <div class="space-y-1">
+                                <!-- Dashboard Juri -->
+                                <div class="relative group">
+                                    <a href="{{ route('jury.dashboard') }}" 
+                                       class="nav-item-link flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-150 {{ request()->routeIs('jury.dashboard') ? 'bg-blue-600 text-white font-semibold shadow-md shadow-blue-600/30' : 'text-slate-400 hover:text-slate-100 hover:bg-slate-900' }}">
+                                        <svg class="w-5 h-5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
+                                        </svg>
+                                        <span class="sidebar-label truncate">Dashboard Penilaian</span>
+                                    </a>
+                                    <span class="tooltip-when-collapsed absolute left-full ml-2 top-1/2 -translate-y-1/2 px-2.5 py-1.5 bg-slate-900 text-white text-xs font-semibold rounded-lg shadow-xl z-50 pointer-events-none border border-slate-700 whitespace-nowrap opacity-0 transition-opacity duration-150">
+                                        Dashboard Penilaian
+                                    </span>
+                                </div>
+
+                                @if(isset($currentFestival) && $currentFestival)
+                                    <!-- Pilih Subkategori Partisipasi -->
+                                    <div class="relative group">
+                                        <a href="{{ route('jury.participations.index', $currentFestival) }}" 
+                                           class="nav-item-link flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-150 {{ request()->routeIs('jury.participations.*') ? 'bg-blue-600 text-white font-semibold shadow-md shadow-blue-600/30' : 'text-slate-400 hover:text-slate-100 hover:bg-slate-900' }}">
+                                            <svg class="w-5 h-5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                                <path stroke-linecap="round" stroke-linejoin="round" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+                                            </svg>
+                                            <span class="sidebar-label truncate">Pilih Subkategori</span>
+                                        </a>
+                                        <span class="tooltip-when-collapsed absolute left-full ml-2 top-1/2 -translate-y-1/2 px-2.5 py-1.5 bg-slate-900 text-white text-xs font-semibold rounded-lg shadow-xl z-50 pointer-events-none border border-slate-700 whitespace-nowrap opacity-0 transition-opacity duration-150">
+                                            Pilih Subkategori
+                                        </span>
+                                    </div>
+                                @endif
+                            </div>
+                        </div>
+                    @endif
+
+                </nav>
+            </div>
+
+            <!-- Bottom: Collapse Toggle Button (Desktop) -->
+            <div class="p-3 border-t border-slate-800/80 bg-slate-950/80">
+                <button type="button" 
+                        onclick="toggleSidebar()" 
+                        class="sidebar-collapse-btn w-full flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-semibold text-slate-400 hover:text-white hover:bg-slate-900 transition-colors">
+                    <svg class="sidebar-collapse-icon w-4 h-4 shrink-0 transition-transform duration-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M11 19l-7-7 7-7m8 14l-7-7 7-7" />
+                    </svg>
+                    <span class="sidebar-collapse-text truncate">Ciutkan Menu</span>
+                </button>
+            </div>
+        </aside>
+
+        <!-- ========================================================= -->
+        <!-- MAIN CONTENT AREA -->
+        <!-- ========================================================= -->
+        <div class="flex-1 flex flex-col min-w-0 overflow-y-auto">
+            
+            <!-- Top Navbar -->
+            <header class="sticky top-0 z-30 bg-white/95 backdrop-blur-md border-b border-gray-200/90 shadow-sm shrink-0">
+                <div class="px-4 sm:px-6 lg:px-8">
+                    <div class="flex items-center justify-between h-16">
+                        
+                        <!-- Left: Sidebar Toggle + Title/Context -->
+                        <div class="flex items-center gap-3">
+                            <!-- Mobile Hamburger Button -->
+                            <button type="button" 
+                                    onclick="toggleMobileSidebar()" 
+                                    class="lg:hidden p-2 rounded-lg text-gray-500 hover:text-gray-900 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                <span class="sr-only">Buka menu</span>
+                                <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+                                </svg>
+                            </button>
+
+                            <!-- Desktop Sidebar Toggle Icon -->
+                            <button type="button" 
+                                    onclick="toggleSidebar()" 
+                                    title="Toggle Sidebar"
+                                    class="hidden lg:flex p-2 rounded-lg text-gray-400 hover:text-gray-700 hover:bg-gray-100 transition-colors">
+                                <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h7" />
+                                </svg>
+                            </button>
+
+                            <!-- Context / Breadcrumb / Section Header -->
+                            <div class="flex items-center gap-2 text-sm">
+                                <a href="{{ route('home') }}" class="text-gray-400 hover:text-gray-600 hidden sm:inline-flex items-center gap-1 font-medium">
+                                    <span>Beranda</span>
+                                </a>
+                                <span class="text-gray-300 hidden sm:inline">/</span>
+                                <span class="font-semibold text-gray-900 truncate">
+                                    {{ $header ?? 'Dashboard' }}
+                                </span>
+                            </div>
+                        </div>
+
+                        <!-- Right: Active Festival + User Info + Logout -->
+                        <div class="flex items-center gap-3 sm:gap-4">
+                            
+                            <!-- Festival Active Badge (Superadmin only) -->
+                            @if(isset($currentFestival) && $currentFestival)
+                                <a href="{{ route('admin.select-festival.index') }}" 
+                                   title="Klik untuk memilih periode festival lain"
+                                   class="hidden md:inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-semibold bg-blue-50 text-blue-700 border border-blue-200/80 hover:bg-blue-100 hover:border-blue-300 transition-colors">
+                                    <svg class="w-3.5 h-3.5 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                    </svg>
+                                    <span>{{ $currentFestival->name }} ({{ $currentFestival->year }})</span>
+                                </a>
+                            @endif
+
+                            <!-- User Info Profile -->
+                            <div class="flex items-center gap-2.5 pl-2 sm:border-l border-gray-200">
+                                <div class="w-8 h-8 rounded-full bg-slate-900 text-white font-bold text-xs flex items-center justify-center shrink-0 shadow-sm">
+                                    {{ strtoupper(substr(auth()->user()->name, 0, 2)) }}
+                                </div>
+                                <div class="hidden sm:block text-left">
+                                    <div class="text-xs font-semibold text-gray-900 leading-tight">
+                                        {{ auth()->user()->name }}
+                                    </div>
+                                    <div class="text-[10px] font-medium text-slate-500 uppercase tracking-wider">
+                                        {{ auth()->user()->role->label() }}
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Logout Button (Always top right) -->
                             <form method="POST" action="{{ route('logout') }}" class="inline">
                                 @csrf
-                                <button type="submit" class="text-gray-300 hover:text-white text-sm font-medium transition-colors">
-                                    Keluar
+                                <button type="submit" 
+                                        title="Keluar dari sistem"
+                                        class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold text-red-600 hover:text-white hover:bg-red-600 border border-red-200 hover:border-red-600 transition-all duration-150">
+                                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                                    </svg>
+                                    <span class="hidden sm:inline">Keluar</span>
                                 </button>
                             </form>
                         </div>
                     </div>
                 </div>
-            </div>
-        </nav>
-
-        <!-- Page Header -->
-        @isset($header)
-            <header class="bg-white shadow">
-                <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
-                    <h1 class="text-3xl font-bold text-gray-900">
-                        {{ $header }}
-                    </h1>
-                </div>
             </header>
-        @endisset
 
-        <!-- Page Content -->
-        <main class="py-8">
-            <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-                @if(session('success'))
-                    <div class="mb-4 bg-green-50 border border-green-200 text-green-800 px-4 py-3 rounded">
-                        {{ session('success') }}
-                    </div>
-                @endif
+            <!-- Main Scrollable Body Content -->
+            <main class="flex-1 py-8 px-4 sm:px-6 lg:px-8">
+                <div class="max-w-7xl mx-auto">
+                    
+                    <!-- Flash Notifications -->
+                    @if(session('success'))
+                        <div class="mb-6 flex items-center justify-between p-4 bg-emerald-50 border border-emerald-200 rounded-xl text-emerald-800 text-sm shadow-sm">
+                            <div class="flex items-center gap-3">
+                                <svg class="w-5 h-5 text-emerald-500 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                </svg>
+                                <span>{{ session('success') }}</span>
+                            </div>
+                            <button type="button" onclick="this.parentElement.remove()" class="text-emerald-500 hover:text-emerald-700">
+                                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
+                            </button>
+                        </div>
+                    @endif
 
-                @if(session('error'))
-                    <div class="mb-4 bg-red-50 border border-red-200 text-red-800 px-4 py-3 rounded">
-                        {{ session('error') }}
-                    </div>
-                @endif
+                    @if(session('error'))
+                        <div class="mb-6 flex items-center justify-between p-4 bg-red-50 border border-red-200 rounded-xl text-red-800 text-sm shadow-sm">
+                            <div class="flex items-center gap-3">
+                                <svg class="w-5 h-5 text-red-500 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                </svg>
+                                <span>{{ session('error') }}</span>
+                            </div>
+                            <button type="button" onclick="this.parentElement.remove()" class="text-red-500 hover:text-red-700">
+                                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
+                            </button>
+                        </div>
+                    @endif
 
-                @if(session('warning'))
-                    <div class="mb-4 bg-yellow-50 border border-yellow-200 text-yellow-800 px-4 py-3 rounded">
-                        {{ session('warning') }}
-                    </div>
-                @endif
+                    @if(session('warning'))
+                        <div class="mb-6 flex items-center justify-between p-4 bg-amber-50 border border-amber-200 rounded-xl text-amber-800 text-sm shadow-sm">
+                            <div class="flex items-center gap-3">
+                                <svg class="w-5 h-5 text-amber-500 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                                </svg>
+                                <span>{{ session('warning') }}</span>
+                            </div>
+                            <button type="button" onclick="this.parentElement.remove()" class="text-amber-500 hover:text-amber-700">
+                                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
+                            </button>
+                        </div>
+                    @endif
 
-                {{ $slot }}
-            </div>
-        </main>
+                    <!-- Page Slot Content -->
+                    {{ $slot }}
+                </div>
+            </main>
+
+        </div>
     </div>
+
+    <!-- Toggle Script -->
+    <script>
+        function toggleSidebar() {
+            const isCollapsed = document.body.classList.toggle('sidebar-collapsed');
+            try {
+                localStorage.setItem('fi_sidebar_collapsed', isCollapsed ? 'true' : 'false');
+            } catch (e) {}
+        }
+
+        function toggleMobileSidebar() {
+            const sidebar = document.getElementById('app-sidebar');
+            const backdrop = document.getElementById('mobile-sidebar-backdrop');
+            
+            const isOpen = !sidebar.classList.contains('-translate-x-full');
+            if (isOpen) {
+                sidebar.classList.add('-translate-x-full');
+                backdrop.classList.add('opacity-0');
+                setTimeout(() => backdrop.classList.add('hidden'), 300);
+            } else {
+                backdrop.classList.remove('hidden');
+                setTimeout(() => backdrop.classList.remove('opacity-0'), 10);
+                sidebar.classList.remove('-translate-x-full');
+            }
+        }
+    </script>
 </body>
 </html>
