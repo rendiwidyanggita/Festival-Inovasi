@@ -27,8 +27,8 @@
         <env name="DB_HOST" value="127.0.0.1"/>
         <env name="DB_PORT" value="3306"/>
         <env name="DB_DATABASE" value="festival_inovasi_test"/>
-        <env name="DB_USERNAME" value="root"/>
-        <env name="DB_PASSWORD" value=""/>
+        <env name="DB_USERNAME" value="festival"/>
+        <env name="DB_PASSWORD" value="festival123"/>
         <env name="DB_URL" value=""/>
         <env name="SUPERADMIN_EMAIL" value="superadmin@test.local"/>
         <env name="SUPERADMIN_PASSWORD" value="superadmin-test-password"/>
