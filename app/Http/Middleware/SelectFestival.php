@@ -17,20 +17,36 @@ class SelectFestival
     public function handle(Request $request, Closure $next): Response
     {
         $festivalId = session('selected_festival_id');
+        $festival = null;
         
         if ($festivalId) {
             $festival = \App\Models\Festival::find($festivalId);
-            
+        }
+
+        // Auto-select latest active/ongoing or latest festival if none selected
+        if (!$festival) {
+            $festival = \App\Models\Festival::where('status', \App\Enums\FestivalStatus::Ongoing)
+                ->orderBy('year', 'desc')
+                ->first()
+                ?? \App\Models\Festival::orderBy('year', 'desc')->first();
+
             if ($festival) {
-                View::share('currentFestival', $festival);
-                session(['currentFestival' => $festival]);
+                $festivalId = $festival->id;
+                session(['selected_festival_id' => $festival->id]);
             }
         }
         
-        // If no festival selected and accessing admin routes that need festival context
-        if (! $festivalId && $request->routeIs('admin.*') && ! $request->routeIs('admin.select-festival*') && ! $request->routeIs('admin.festivals.*')) {
+        if ($festival) {
+            session(['currentFestival' => $festival]);
+            View::share('currentFestival', $festival);
+        } else {
+            View::share('currentFestival', null);
+        }
+        
+        // If no festival exists in DB and accessing routes that need a festival
+        if (! $festival && $request->routeIs('admin.*') && ! $request->routeIs('admin.select-festival*') && ! $request->routeIs('admin.festivals.*') && ! $request->routeIs('admin.dashboard')) {
             return redirect()->route('admin.select-festival.index')
-                ->with('warning', 'Silakan pilih periode festival terlebih dahulu.');
+                ->with('warning', 'Silakan buat atau pilih periode festival terlebih dahulu.');
         }
         
         return $next($request);

@@ -46,9 +46,8 @@
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                                         @if($jury->trashed())
-                                            <form method="POST" action="{{ route('admin.juries.restore', $jury) }}" class="inline">
+                                            <form method="POST" action="{{ route('admin.juries.restore', $jury->id) }}" class="inline">
                                                 @csrf
-                                                @method('PATCH')
                                                 <button type="submit" class="text-green-600 hover:text-green-900">Pulihkan</button>
                                             </form>
                                         @else

@@ -29,7 +29,7 @@
                                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ $institution->awardCategory->name ?? '-' }}</td>
                                         <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                                             <a href="{{ route('admin.institutions.edit', $institution) }}" class="text-blue-600 hover:text-blue-900 mr-3">Edit</a>
-                                            @if(!$institution->awardCategory->isRosterLocked())
+                                            @if(!$institution->awardCategory?->isRosterLocked())
                                                 <form method="POST" action="{{ route('admin.institutions.destroy', $institution) }}" class="inline" onsubmit="return confirm('Hapus instansi ini?')">
                                                     @csrf
                                                     @method('DELETE')

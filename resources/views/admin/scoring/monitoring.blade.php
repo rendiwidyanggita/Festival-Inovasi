@@ -1,124 +1,171 @@
 <x-layouts.app>
     <x-slot name="header">
-        Monitoring Penilaian
+        Monitoring Penilaian Dewan Juri
     </x-slot>
 
-    <!-- Filters -->
-    <div class="bg-white overflow-hidden shadow-sm rounded-lg mb-6">
-        <div class="p-6">
-            <form method="GET" class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div>
-                    <label for="festival" class="block text-sm font-medium text-gray-700 mb-2">Festival</label>
-                    <select name="festival" id="festival" class="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
-                        @foreach($festivals as $festival)
-                            <option value="{{ $festival->id }}" {{ $selectedFestival == $festival->id ? 'selected' : '' }}>
-                                {{ $festival->name }} ({{ $festival->year }})
-                            </option>
-                        @endforeach
-                    </select>
+    <div class="space-y-6">
+        <!-- Filter Header Bar (Preline UI / Flowbite style) -->
+        <div class="bg-white rounded-2xl p-5 md:p-6 border border-slate-200/80 shadow-xs">
+            <form method="GET" class="grid grid-cols-1 md:grid-cols-12 gap-4 items-end">
+                <div class="md:col-span-5">
+                    <label for="festival" class="block text-xs font-semibold uppercase tracking-wider text-slate-500 mb-2">
+                        Periode Festival
+                    </label>
+                    <div class="relative">
+                        <select name="festival" id="festival" 
+                                class="w-full rounded-xl border-slate-200 bg-slate-50/50 py-2.5 px-3.5 text-sm font-semibold text-slate-800 shadow-xs focus:border-blue-500 focus:bg-white focus:ring-4 focus:ring-blue-500/10 transition-all">
+                            @foreach($festivals as $festival)
+                                <option value="{{ $festival->id }}" {{ $selectedFestival == $festival->id ? 'selected' : '' }}>
+                                    {{ $festival->name }} ({{ $festival->year }})
+                                </option>
+                            @endforeach
+                        </select>
+                    </div>
                 </div>
                 
-                <div>
-                    <label for="subcategory" class="block text-sm font-medium text-gray-700 mb-2">Subkategori</label>
-                    <select name="subcategory" id="subcategory" class="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
-                        <option value="">Semua Subkategori</option>
-                        @foreach($subcategories as $subcategory)
-                            <option value="{{ $subcategory->id }}" {{ $selectedSubcategory == $subcategory->id ? 'selected' : '' }}>
-                                {{ $subcategory->festivalCategory->name }} - {{ $subcategory->name }}
-                            </option>
-                        @endforeach
-                    </select>
+                <div class="md:col-span-5">
+                    <label for="subcategory" class="block text-xs font-semibold uppercase tracking-wider text-slate-500 mb-2">
+                        Subkategori Penilaian
+                    </label>
+                    <div class="relative">
+                        <select name="subcategory" id="subcategory" 
+                                class="w-full rounded-xl border-slate-200 bg-slate-50/50 py-2.5 px-3.5 text-sm font-semibold text-slate-800 shadow-xs focus:border-blue-500 focus:bg-white focus:ring-4 focus:ring-blue-500/10 transition-all">
+                            <option value="">-- Pilih Subkategori --</option>
+                            @foreach($subcategories as $subcategory)
+                                <option value="{{ $subcategory->id }}" {{ $selectedSubcategory == $subcategory->id ? 'selected' : '' }}>
+                                    [{{ $subcategory->festivalCategory->name }}] {{ $subcategory->name }}
+                                </option>
+                            @endforeach
+                        </select>
+                    </div>
                 </div>
                 
-                <div class="flex items-end">
-                    <button type="submit" class="w-full inline-flex justify-center items-center px-4 py-2 bg-blue-600 border border-transparent rounded-md font-semibold text-sm text-white hover:bg-blue-700 transition-colors">
-                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                <div class="md:col-span-2">
+                    <button type="submit" 
+                            class="w-full inline-flex justify-center items-center gap-2 px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-semibold text-sm rounded-xl shadow-md shadow-blue-600/30 transition-all duration-150 active:scale-[0.96]">
+                        <svg class="size-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"/>
                         </svg>
-                        Filter
+                        Terapkan
                     </button>
                 </div>
             </form>
         </div>
-    </div>
 
-    @if($selectedSubcategory)
-        <!-- Subcategory Actions -->
-        <div class="bg-white overflow-hidden shadow-sm rounded-lg mb-6">
-            <div class="p-6">
-                <div class="flex items-center justify-between">
+        @if($selectedSubcategory && $subcategories->find($selectedSubcategory))
+            @php
+                $activeCat = $subcategories->find($selectedSubcategory);
+            @endphp
+            <!-- Subcategory Status & Lifecycle Action Card (Preline UI Banner Style) -->
+            <div class="bg-white rounded-2xl p-5 md:p-6 border border-slate-200/80 shadow-xs">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                     <div>
-                        <h3 class="text-lg font-semibold text-gray-900">{{ $subcategories->find($selectedSubcategory)->name }}</h3>
-                        <p class="text-sm text-gray-600 mt-1">
-                            {{ $subcategories->find($selectedSubcategory)->festivalCategory->name }} - 
-                            Status: 
-                            <span class="px-2 py-1 text-xs font-semibold rounded-full 
-                                {{ $subcategories->find($selectedSubcategory)->scoring_status->value === 'preparation' ? 'bg-yellow-100 text-yellow-800' : 
-                                  ($subcategories->find($selectedSubcategory)->scoring_status->value === 'open' ? 'bg-green-100 text-green-800' : 
-                                  'bg-blue-100 text-blue-800') }}">
-                                {{ $subcategories->find($selectedSubcategory)->scoring_status->label() }}
+                        <div class="flex items-center gap-2 mb-1.5">
+                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-md text-xs font-semibold {{ $activeCat->festivalCategory->assessment_type->value === 'innovation' ? 'bg-blue-50 text-blue-700' : 'bg-purple-50 text-purple-700' }}">
+                                {{ $activeCat->festivalCategory->name }}
                             </span>
+                            <span class="inline-flex items-center gap-1.5 py-0.5 px-2.5 rounded-full text-xs font-semibold
+                                {{ $activeCat->scoring_status->value === 'preparation' ? 'bg-amber-50 text-amber-700 border border-amber-200/60' : 
+                                  ($activeCat->scoring_status->value === 'open' ? 'bg-emerald-50 text-emerald-700 border border-emerald-200/60' : 
+                                  'bg-blue-50 text-blue-700 border border-blue-200/60') }}">
+                                <span class="size-1.5 rounded-full {{ $activeCat->scoring_status->value === 'open' ? 'bg-emerald-500 animate-pulse' : ($activeCat->scoring_status->value === 'preparation' ? 'bg-amber-500' : 'bg-blue-500') }}"></span>
+                                Status: {{ $activeCat->scoring_status->label() }}
+                            </span>
+                        </div>
+                        <h2 class="text-xl font-extrabold text-slate-900 tracking-tight">{{ $activeCat->name }}</h2>
+                        <p class="text-xs text-slate-500 mt-1">
+                            Kuota Pemenang: <span class="font-bold text-slate-800">{{ $activeCat->winner_count }} Juara</span> • Roster Juri: <span class="font-bold text-slate-800">{{ $juries->count() }} Terdaftar</span> • Total Objek: <span class="font-bold text-slate-800">{{ $objects->count() }} Peserta</span>
                         </p>
                     </div>
                     
-                    <div class="flex gap-3">
-                        @if($subcategories->find($selectedSubcategory)->scoring_status->value === 'preparation')
+                    <div class="flex items-center gap-2.5 shrink-0">
+                        @if($activeCat->scoring_status->value === 'preparation')
                             <button type="button" 
-                                onclick="confirmOpenScoring('{{ $selectedSubcategory }}')"
-                                class="inline-flex items-center px-4 py-2 bg-green-600 border border-transparent rounded-md font-semibold text-sm text-white hover:bg-green-700 transition-colors">
-                                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    onclick="confirmOpenScoring('{{ $selectedSubcategory }}')"
+                                    class="inline-flex items-center gap-2 px-4 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-xs rounded-xl shadow-md shadow-emerald-600/30 transition-all duration-150 active:scale-[0.96]">
+                                <svg class="size-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 11V7a4 4 0 118 0m-4 8v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2z"/>
                                 </svg>
-                                Buka Penilaian
+                                Buka Penilaian & Kunci Roster
                             </button>
-                        @elseif($subcategories->find($selectedSubcategory)->scoring_status->value === 'open')
+                        @elseif($activeCat->scoring_status->value === 'open')
                             <form method="POST" action="{{ route('admin.award-categories.close-scoring', $selectedSubcategory) }}" class="inline">
                                 @csrf
                                 <button type="submit" 
-                                    onclick="return confirm('Tutup penilaian untuk subkategori ini? Tindakan ini tidak dapat dibatalkan.')"
-                                    class="inline-flex items-center px-4 py-2 bg-red-600 border border-transparent rounded-md font-semibold text-sm text-white hover:bg-red-700 transition-colors">
-                                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        onclick="return confirm('Tutup penilaian untuk subkategori ini? Seluruh juri tidak dapat mengubah nilai lagi.')"
+                                        class="inline-flex items-center gap-2 px-4 py-2.5 bg-rose-600 hover:bg-rose-700 text-white font-semibold text-xs rounded-xl shadow-md shadow-rose-600/30 transition-all duration-150 active:scale-[0.96]">
+                                    <svg class="size-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
                                     </svg>
-                                    Tutup Penilaian
+                                    Tutup Penilaian (Selesai)
                                 </button>
                             </form>
                         @endif
+
+                        <a href="{{ route('admin.award-categories.rankings', $activeCat) }}" 
+                           class="inline-flex items-center gap-2 px-4 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold text-xs rounded-xl transition-all duration-150 active:scale-[0.96]">
+                            <svg class="size-4 text-slate-600" fill="currentColor" viewBox="0 0 20 20">
+                                <path d="M2 11a1 1 0 011-1h2a1 1 0 011 1v5a1 1 0 01-1 1H3a1 1 0 01-1-1v-5zM8 7a1 1 0 011-1h2a1 1 0 011 1v9a1 1 0 01-1 1H9a1 1 0 01-1-1V7zM14 4a1 1 0 011-1h2a1 1 0 011 1v12a1 1 0 01-1 1h-2a1 1 0 01-1-1V4z"/>
+                            </svg>
+                            Lihat Ranking & Pemenang
+                        </a>
                     </div>
                 </div>
             </div>
-        </div>
 
-        <!-- Monitoring Matrix -->
-        <div class="bg-white overflow-hidden shadow-sm rounded-lg">
-            <div class="p-6">
-                <h3 class="text-lg font-semibold text-gray-900 mb-4">Matriks Progress Penilaian</h3>
+            <!-- Monitoring Matrix Table (Flowbite / Preline UI High-Density Pattern) -->
+            <div class="bg-white rounded-2xl border border-slate-200/80 shadow-xs overflow-hidden">
+                <div class="p-5 md:p-6 border-b border-slate-200/80 flex items-center justify-between">
+                    <div>
+                        <h3 class="text-base font-bold text-slate-900">Matriks Evaluasi Real-Time</h3>
+                        <p class="text-xs text-slate-500 mt-0.5">Status evaluasi per dewan juri untuk setiap objek inovasi / instansi.</p>
+                    </div>
+                    <div class="flex items-center gap-3 text-xs">
+                        <span class="inline-flex items-center gap-1.5"><span class="size-2 rounded-full bg-amber-400"></span> Draft</span>
+                        <span class="inline-flex items-center gap-1.5"><span class="size-2 rounded-full bg-blue-500"></span> Terkirim</span>
+                        <span class="inline-flex items-center gap-1.5"><span class="size-2 rounded-full bg-purple-500"></span> Terkunci</span>
+                        <span class="inline-flex items-center gap-1.5"><span class="size-2 rounded-full bg-rose-500"></span> Revisi</span>
+                    </div>
+                </div>
                 
                 @if($juries->count() > 0 && $objects->count() > 0)
                     <div class="overflow-x-auto">
-                        <table class="min-w-full">
+                        <table class="w-full text-left border-collapse min-w-full">
                             <thead>
-                                <tr>
-                                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider bg-gray-50 sticky left-0 z-10">
-                                        Juri
+                                <tr class="bg-slate-50/75 border-b border-slate-200 text-[11px] font-semibold uppercase tracking-wider text-slate-500">
+                                    <th class="py-3.5 px-6 sticky left-0 bg-slate-50/95 backdrop-blur-sm z-20 shadow-[1px_0_0_0_#e2e8f0]">
+                                        Dewan Juri
                                     </th>
                                     @foreach($objects as $object)
-                                        <th class="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider bg-gray-50 whitespace-nowrap">
-                                            <div class="max-w-32 truncate" title="{{ $object->name }}">
+                                        <th class="py-3.5 px-4 text-center min-w-[130px] max-w-[180px]">
+                                            <div class="truncate font-semibold text-slate-800" title="{{ $object->name }}">
                                                 {{ $object->name }}
                                             </div>
+                                            @if($assessmentType === 'innovation' && $object->institution)
+                                                <div class="text-[10px] text-slate-400 truncate mt-0.5">
+                                                    {{ $object->institution->name }}
+                                                </div>
+                                            @endif
                                         </th>
                                     @endforeach
-                                    <th class="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider bg-gray-50">
-                                        Progress
+                                    <th class="py-3.5 px-6 text-center">
+                                        Progress Juri
                                     </th>
                                 </tr>
                             </thead>
-                            <tbody class="divide-y divide-gray-200">
+                            <tbody class="divide-y divide-slate-100 text-sm">
                                 @foreach($juries as $jury)
-                                    <tr class="hover:bg-gray-50">
-                                        <td class="px-4 py-4 whitespace-nowrap text-sm font-medium text-gray-900 bg-white sticky left-0 z-10">
-                                            {{ $jury->user->name }}
+                                    <tr class="hover:bg-slate-50/70 transition-colors">
+                                        <td class="py-4 px-6 font-semibold text-slate-900 sticky left-0 bg-white shadow-[1px_0_0_0_#e2e8f0] z-10 whitespace-nowrap">
+                                            <div class="flex items-center gap-2.5">
+                                                <div class="size-8 rounded-lg bg-indigo-50 text-indigo-700 font-bold text-xs flex items-center justify-center">
+                                                    {{ substr($jury->user->name, 0, 2) }}
+                                                </div>
+                                                <div>
+                                                    <div class="text-xs font-bold text-slate-900">{{ $jury->user->name }}</div>
+                                                    <div class="text-[10px] text-slate-400">Juri Independen</div>
+                                                </div>
+                                            </div>
                                         </td>
                                         
                                         @php
@@ -130,45 +177,49 @@
                                             @php
                                                 $assessmentData = $matrix[$jury->id][$object->id] ?? null;
                                                 $status = $assessmentData['status'] ?? 'not_started';
-                                                $canLock = $status === 'submitted';
-                                                $canRequestRevision = in_array($status, ['submitted', 'locked']);
                                                 
                                                 if(in_array($status, ['submitted', 'locked'])) {
                                                     $juryProgress++;
                                                 }
                                             @endphp
                                             
-                                            <td class="px-4 py-4 whitespace-nowrap text-center">
-                                                <div class="flex flex-col items-center gap-2">
+                                            <td class="py-3 px-3 text-center align-middle whitespace-nowrap">
+                                                <div class="inline-flex flex-col items-center gap-1.5">
                                                     <!-- Status Badge -->
-                                                    <span class="px-2 py-1 text-xs font-semibold rounded-full inline-block min-w-20
-                                                        {{ $status === 'not_started' ? 'bg-gray-100 text-gray-800' : 
-                                                          ($status === 'draft' ? 'bg-yellow-100 text-yellow-800' : 
-                                                          ($status === 'submitted' ? 'bg-blue-100 text-blue-800' : 
-                                                          ($status === 'locked' ? 'bg-purple-100 text-purple-800' : 
-                                                          'bg-red-100 text-red-800'))) }}">
-                                                        @if($status === 'not_started')
-                                                            -
-                                                        @elseif($status === 'draft')
+                                                    @if($status === 'not_started')
+                                                        <span class="text-xs text-slate-300 font-medium">—</span>
+                                                    @elseif($status === 'draft')
+                                                        <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-amber-50 text-amber-700 border border-amber-200">
+                                                            <span class="size-1.5 rounded-full bg-amber-500"></span>
                                                             Draft
-                                                        @elseif($status === 'submitted')
+                                                        </span>
+                                                    @elseif($status === 'submitted')
+                                                        <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-blue-50 text-blue-700 border border-blue-200">
+                                                            <span class="size-1.5 rounded-full bg-blue-500"></span>
                                                             Terkirim
-                                                        @elseif($status === 'locked')
+                                                        </span>
+                                                    @elseif($status === 'locked')
+                                                        <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-purple-50 text-purple-700 border border-purple-200">
+                                                            <span class="size-1.5 rounded-full bg-purple-500"></span>
                                                             Terkunci
-                                                        @elseif($status === 'revision_requested')
+                                                        </span>
+                                                    @elseif($status === 'revision_requested')
+                                                        <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-rose-50 text-rose-700 border border-rose-200">
+                                                            <span class="size-1.5 rounded-full bg-rose-500"></span>
                                                             Revisi
-                                                        @endif
-                                                    </span>
+                                                        </span>
+                                                    @endif
                                                     
                                                     <!-- Action Buttons -->
                                                     @if($status !== 'not_started')
-                                                        <div class="flex gap-1">
+                                                        <div class="flex items-center gap-1 mt-0.5">
                                                             @if($status === 'submitted')
                                                                 <form method="POST" action="{{ route('admin.assessments.lock', [$assessmentType, $assessmentData['id'] ?? $object->id]) }}" class="inline">
                                                                     @csrf
                                                                     <button type="submit" 
-                                                                        onclick="return confirm('Kunci penilaian ini?')"
-                                                                        class="text-xs px-2 py-1 bg-purple-100 text-purple-700 rounded hover:bg-purple-200">
+                                                                            onclick="return confirm('Kunci penilaian ini?')"
+                                                                            title="Kunci Penilaian"
+                                                                            class="text-[10px] font-semibold px-2 py-0.5 bg-purple-50 hover:bg-purple-100 text-purple-700 rounded-md border border-purple-200 transition-colors">
                                                                         Kunci
                                                                     </button>
                                                                 </form>
@@ -176,8 +227,9 @@
                                                             
                                                             @if(in_array($status, ['submitted', 'locked']))
                                                                 <button type="button" 
-                                                                    onclick="showRevisionModal('{{ $assessmentType }}', '{{ $assessmentData['id'] ?? $object->id }}', '{{ $jury->user->name }}', '{{ $object->name }}')"
-                                                                    class="text-xs px-2 py-1 bg-red-100 text-red-700 rounded hover:bg-red-200">
+                                                                        onclick="showRevisionModal('{{ $assessmentType }}', '{{ $assessmentData['id'] ?? $object->id }}', '{{ addslashes($jury->user->name) }}', '{{ addslashes($object->name) }}')"
+                                                                        title="Minta Revisi Juri"
+                                                                        class="text-[10px] font-semibold px-2 py-0.5 bg-rose-50 hover:bg-rose-100 text-rose-700 rounded-md border border-rose-200 transition-colors">
                                                                     Revisi
                                                                 </button>
                                                             @endif
@@ -187,13 +239,19 @@
                                             </td>
                                         @endforeach
                                         
-                                        <td class="px-4 py-4 whitespace-nowrap text-center">
-                                            <div class="text-sm font-medium {{ $juryProgress == $juryTotal ? 'text-green-600' : 'text-gray-900' }}">
-                                                {{ $juryProgress }}/{{ $juryTotal }}
-                                            </div>
-                                            <div class="w-16 h-2 bg-gray-200 rounded-full mt-1 mx-auto">
-                                                <div class="h-2 rounded-full {{ $juryProgress == $juryTotal ? 'bg-green-500' : 'bg-blue-500' }}" 
-                                                    style="width: {{ $juryTotal > 0 ? ($juryProgress / $juryTotal * 100) : 0 }}%"></div>
+                                        <td class="py-4 px-6 text-center whitespace-nowrap">
+                                            @php
+                                                $pct = $juryTotal > 0 ? round(($juryProgress / $juryTotal) * 100) : 0;
+                                                $allDone = $juryProgress == $juryTotal;
+                                            @endphp
+                                            <div class="inline-flex flex-col items-center gap-1">
+                                                <span class="text-xs font-bold tabular-nums {{ $allDone ? 'text-emerald-600' : 'text-slate-800' }}">
+                                                    {{ $juryProgress }}/{{ $juryTotal }} ({{ $pct }}%)
+                                                </span>
+                                                <div class="w-20 bg-slate-100 rounded-full h-1.5 overflow-hidden border border-slate-200/50">
+                                                    <div class="h-full rounded-full transition-all duration-300 {{ $allDone ? 'bg-emerald-500' : 'bg-blue-600' }}"
+                                                         style="width: {{ $pct }}%"></div>
+                                                </div>
                                             </div>
                                         </td>
                                     </tr>
@@ -202,142 +260,150 @@
                         </table>
                     </div>
                 @else
-                    <div class="text-center py-8">
-                        <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
-                        </svg>
-                        <h3 class="mt-2 text-sm font-medium text-gray-900">Tidak ada data</h3>
-                        <p class="mt-1 text-sm text-gray-500">
-                            {{ $juries->count() === 0 ? 'Belum ada juri yang terdaftar pada subkategori ini.' : 'Belum ada peserta pada subkategori ini.' }}
+                    <div class="text-center py-12">
+                        <div class="size-12 rounded-xl bg-slate-100 text-slate-400 flex items-center justify-center mx-auto mb-3">
+                            <svg class="size-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                        </div>
+                        <h4 class="text-sm font-bold text-slate-900">Belum Ada Data Penilaian</h4>
+                        <p class="text-xs text-slate-500 mt-1">
+                            {{ $juries->count() === 0 ? 'Belum ada dewan juri yang memilih subkategori ini.' : 'Belum ada objek peserta terdaftar.' }}
                         </p>
                     </div>
                 @endif
             </div>
-        </div>
-    @else
-        <div class="bg-white overflow-hidden shadow-sm rounded-lg">
-            <div class="p-6 text-center">
-                <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                </svg>
-                <h3 class="mt-2 text-sm font-medium text-gray-900">Pilih Subkategori</h3>
-                <p class="mt-1 text-sm text-gray-500">Gunakan filter di atas untuk memilih subkategori yang ingin dimonitor.</p>
+        @else
+            <!-- Filter Prompt State -->
+            <div class="bg-white rounded-2xl p-8 md:p-12 border border-slate-200/80 shadow-xs text-center max-w-lg mx-auto">
+                <div class="size-14 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center mx-auto mb-4 ring-8 ring-blue-50/50">
+                    <svg class="size-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"/>
+                    </svg>
+                </div>
+                <h3 class="text-base font-bold text-slate-900">Pilih Subkategori Penilaian</h3>
+                <p class="text-xs text-slate-500 mt-1.5 leading-relaxed">
+                    Pilih subkategori di atas untuk melihat matriks pengisian nilai juri, mengunci nilai, atau meminta revisi.
+                </p>
             </div>
-        </div>
-    @endif
-</x-layouts.app>
+        @endif
+    </div>
 
-<!-- Open Scoring Confirmation Modal -->
-<div id="openScoringModal" class="fixed inset-0 bg-gray-500 bg-opacity-75 hidden items-center justify-center z-50">
-    <div class="bg-white rounded-lg max-w-md w-full mx-4 p-6">
-        <div class="flex items-start">
-            <div class="flex-shrink-0">
-                <svg class="h-6 w-6 text-yellow-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+    <!-- Open Scoring Confirmation Modal (Flowbite Pattern with Backdrop Blur) -->
+    <div id="openScoringModal" class="fixed inset-0 bg-slate-950/60 backdrop-blur-xs hidden items-center justify-center z-50 p-4 transition-opacity">
+        <div class="bg-white rounded-3xl max-w-md w-full p-6 md:p-8 shadow-2xl border border-slate-200 transform transition-all scale-100">
+            <div class="size-12 rounded-2xl bg-amber-50 text-amber-600 flex items-center justify-center mb-4 ring-8 ring-amber-50/50">
+                <svg class="size-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
                 </svg>
             </div>
-            <div class="ml-3 flex-1">
-                <h3 class="text-lg font-medium text-gray-900">Konfirmasi Buka Penilaian</h3>
-                <div class="mt-2 text-sm text-gray-500">
-                    <p class="font-semibold text-red-600 mb-2">Perhatian:</p>
-                    <ul class="list-disc list-inside space-y-1">
-                        <li>Roster juri dan peserta akan dikunci permanen</li>
-                        <li>Juri tidak dapat menambah/menghapus subkategori</li>
-                        <li>Tindakan ini tidak dapat dibatalkan</li>
-                    </ul>
-                </div>
+            <h3 class="text-lg font-bold text-slate-900">Konfirmasi Buka Penilaian</h3>
+            <div class="mt-2.5 text-xs text-slate-600 leading-relaxed space-y-2">
+                <p class="font-bold text-amber-800 bg-amber-50 p-2.5 rounded-xl border border-amber-200">
+                    Perhatian: Tindakan pembukaan penilaian bersifat permanen.
+                </p>
+                <ul class="list-disc list-inside space-y-1 text-slate-500">
+                    <li>Roster juri penilai dan objek peserta akan <strong>dikunci permanen</strong>.</li>
+                    <li>Juri tidak dapat menambah atau membatalkan subkategori ini.</li>
+                    <li>Status akan berubah menjadi <strong>Dibuka</strong> dan siap menerima input nilai.</li>
+                </ul>
+            </div>
+            <div class="mt-6 flex items-center justify-end gap-3">
+                <button type="button" onclick="closeOpenScoringModal()" 
+                        class="px-4 py-2.5 rounded-xl text-xs font-semibold text-slate-600 hover:bg-slate-100 transition-colors">
+                    Batal
+                </button>
+                <form id="openScoringForm" method="POST" class="inline">
+                    @csrf
+                    <button type="submit" 
+                            class="px-4 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-xs rounded-xl shadow-md shadow-emerald-600/30 transition-all duration-150 active:scale-[0.96]">
+                        Ya, Buka Penilaian Sekarang
+                    </button>
+                </form>
             </div>
         </div>
-        <div class="mt-5 flex gap-3 justify-end">
-            <button type="button" onclick="closeOpenScoringModal()" class="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50">
-                Batal
-            </button>
-            <form id="openScoringForm" method="POST" class="inline">
+    </div>
+
+    <!-- Request Revision Modal (Flowbite Pattern) -->
+    <div id="revisionModal" class="fixed inset-0 bg-slate-950/60 backdrop-blur-xs hidden items-center justify-center z-50 p-4 transition-opacity">
+        <div class="bg-white rounded-3xl max-w-md w-full p-6 md:p-8 shadow-2xl border border-slate-200 transform transition-all scale-100">
+            <div class="size-12 rounded-2xl bg-rose-50 text-rose-600 flex items-center justify-center mb-4 ring-8 ring-rose-50/50">
+                <svg class="size-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                </svg>
+            </div>
+            <h3 class="text-lg font-bold text-slate-900">Minta Revisi Penilaian</h3>
+            <p class="text-xs text-slate-500 mt-1" id="revisionInfo"></p>
+            
+            <form id="revisionForm" method="POST" class="mt-4">
                 @csrf
-                <button type="submit" class="px-4 py-2 bg-green-600 border border-transparent rounded-md text-sm font-medium text-white hover:bg-green-700">
-                    Ya, Buka Penilaian
-                </button>
+                <div>
+                    <label for="revision_note" class="block text-xs font-semibold uppercase tracking-wider text-slate-500 mb-2">
+                        Catatan Revisi untuk Juri <span class="text-rose-500">*</span>
+                    </label>
+                    <textarea name="revision_note" id="revision_note" rows="4" required
+                              class="w-full rounded-xl border-slate-200 bg-slate-50/50 p-3 text-xs text-slate-800 shadow-xs focus:border-rose-500 focus:bg-white focus:ring-4 focus:ring-rose-500/10 transition-all placeholder:text-slate-400"
+                              placeholder="Tuliskan catatan detail mengapa penilaian perlu diperbaiki oleh dewan juri..."></textarea>
+                </div>
+                
+                <div class="mt-6 flex items-center justify-end gap-3">
+                    <button type="button" onclick="closeRevisionModal()" 
+                            class="px-4 py-2.5 rounded-xl text-xs font-semibold text-slate-600 hover:bg-slate-100 transition-colors">
+                        Batal
+                    </button>
+                    <button type="submit" 
+                            class="px-4 py-2.5 bg-rose-600 hover:bg-rose-700 text-white font-semibold text-xs rounded-xl shadow-md shadow-rose-600/30 transition-all duration-150 active:scale-[0.96]">
+                        Kirim Permintaan Revisi
+                    </button>
+                </div>
             </form>
         </div>
     </div>
-</div>
 
-<!-- Request Revision Modal -->
-<div id="revisionModal" class="fixed inset-0 bg-gray-500 bg-opacity-75 hidden items-center justify-center z-50">
-    <div class="bg-white rounded-lg max-w-md w-full mx-4 p-6">
-        <div class="mb-4">
-            <h3 class="text-lg font-medium text-gray-900">Minta Revisi Penilaian</h3>
-            <p class="text-sm text-gray-500 mt-1" id="revisionInfo"></p>
-        </div>
-        
-        <form id="revisionForm" method="POST">
-            @csrf
-            <div class="mb-4">
-                <label for="revision_note" class="block text-sm font-medium text-gray-700 mb-2">
-                    Catatan Revisi <span class="text-red-500">*</span>
-                </label>
-                <textarea name="revision_note" id="revision_note" rows="4" required
-                    class="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-                    placeholder="Jelaskan alasan mengapa penilaian perlu direvisi..."></textarea>
-            </div>
+    @push('scripts')
+    <script>
+        function confirmOpenScoring(subcategoryId) {
+            const modal = document.getElementById('openScoringModal');
+            const form = document.getElementById('openScoringForm');
+            form.action = `{{ route('admin.award-categories.open-scoring', ['awardCategory' => '__ID__']) }}`.replace('__ID__', subcategoryId);
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        }
+
+        function closeOpenScoringModal() {
+            const modal = document.getElementById('openScoringModal');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        }
+
+        function showRevisionModal(type, id, juryName, objectName) {
+            const modal = document.getElementById('revisionModal');
+            const form = document.getElementById('revisionForm');
+            const info = document.getElementById('revisionInfo');
             
-            <div class="flex gap-3 justify-end">
-                <button type="button" onclick="closeRevisionModal()" class="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50">
-                    Batal
-                </button>
-                <button type="submit" class="px-4 py-2 bg-red-600 border border-transparent rounded-md text-sm font-medium text-white hover:bg-red-700">
-                    Kirim Permintaan Revisi
-                </button>
-            </div>
-        </form>
-    </div>
-</div>
+            form.action = `{{ route('admin.assessments.request-revision', ['type' => '__TYPE__', 'id' => '__ID__']) }}`
+                .replace('__TYPE__', type)
+                .replace('__ID__', id);
+            
+            info.textContent = `Juri: ${juryName} • Objek: ${objectName}`;
+            
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        }
 
-@push('scripts')
-<script>
-    function confirmOpenScoring(subcategoryId) {
-        const modal = document.getElementById('openScoringModal');
-        const form = document.getElementById('openScoringForm');
-        form.action = `{{ route('admin.award-categories.open-scoring', ['awardCategory' => '__ID__']) }}`.replace('__ID__', subcategoryId);
-        modal.classList.remove('hidden');
-        modal.classList.add('flex');
-    }
+        function closeRevisionModal() {
+            const modal = document.getElementById('revisionModal');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+            document.getElementById('revision_note').value = '';
+        }
 
-    function closeOpenScoringModal() {
-        const modal = document.getElementById('openScoringModal');
-        modal.classList.add('hidden');
-        modal.classList.remove('flex');
-    }
+        // Close modals when clicking backdrop
+        document.getElementById('openScoringModal').addEventListener('click', function(e) {
+            if (e.target === this) closeOpenScoringModal();
+        });
 
-    function showRevisionModal(type, id, juryName, objectName) {
-        const modal = document.getElementById('revisionModal');
-        const form = document.getElementById('revisionForm');
-        const info = document.getElementById('revisionInfo');
-        
-        form.action = `{{ route('admin.assessments.request-revision', ['type' => '__TYPE__', 'id' => '__ID__']) }}`
-            .replace('__TYPE__', type)
-            .replace('__ID__', id);
-        
-        info.textContent = `Juri: ${juryName} | Objek: ${objectName}`;
-        
-        modal.classList.remove('hidden');
-        modal.classList.add('flex');
-    }
-
-    function closeRevisionModal() {
-        const modal = document.getElementById('revisionModal');
-        modal.classList.add('hidden');
-        modal.classList.remove('flex');
-        document.getElementById('revision_note').value = '';
-    }
-
-    // Close modals when clicking outside
-    document.getElementById('openScoringModal').addEventListener('click', function(e) {
-        if (e.target === this) closeOpenScoringModal();
-    });
-
-    document.getElementById('revisionModal').addEventListener('click', function(e) {
-        if (e.target === this) closeRevisionModal();
-    });
-</script>
-@endpush
+        document.getElementById('revisionModal').addEventListener('click', function(e) {
+            if (e.target === this) closeRevisionModal();
+        });
+    </script>
+    @endpush
+</x-layouts.app>

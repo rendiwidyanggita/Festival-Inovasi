@@ -48,7 +48,8 @@ class FestivalCategoryController extends Controller
 
     public function edit(FestivalCategory $festival_category): View
     {
-        return view('admin.festival-categories.edit', compact('festival_category'));
+        $category = $festival_category;
+        return view('admin.festival-categories.edit', compact('festival_category', 'category'));
     }
 
     public function update(UpdateRequest $request, FestivalCategory $festival_category): RedirectResponse

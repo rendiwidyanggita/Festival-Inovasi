@@ -26,7 +26,18 @@ class WinnerController extends Controller
      */
     public function index(Request $request): View
     {
-        $festival = $request->session()->get('selected_festival');
+        $festivalId = $request->session()->get('selected_festival_id') 
+            ?? $request->session()->get('selected_festival')?->id
+            ?? $request->session()->get('currentFestival')?->id;
+
+        $festival = $festivalId ? Festival::with(['awardCategories.festivalCategory'])->find($festivalId) : null;
+
+        if (!$festival) {
+            $festival = Festival::with(['awardCategories.festivalCategory'])->orderBy('year', 'desc')->first();
+            if ($festival) {
+                session(['selected_festival_id' => $festival->id, 'currentFestival' => $festival]);
+            }
+        }
 
         if (!$festival) {
             return view('admin.winners.index', [
@@ -35,8 +46,6 @@ class WinnerController extends Controller
                 'awardCategories' => collect(),
             ]);
         }
-
-        $festival = Festival::with(['awardCategories.festivalCategory'])->findOrFail($festival->id);
 
         $awardCategories = $festival->awardCategories()
             ->with(['festivalCategory', 'innovationWinners.innovation.institution', 'institutionWinners.institution'])

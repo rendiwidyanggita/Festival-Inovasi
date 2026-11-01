@@ -37,9 +37,11 @@
                         <label for="status" class="block text-sm font-medium text-gray-700">Status</label>
                         <select name="status" id="status" 
                             class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
-                            <option value="preparation" {{ old('status', $festival->status->value) === 'preparation' ? 'selected' : '' }}>Persiapan</option>
-                            <option value="active" {{ old('status', $festival->status->value) === 'active' ? 'selected' : '' }}>Aktif</option>
-                            <option value="archived" {{ old('status', $festival->status->value) === 'archived' ? 'selected' : '' }}>Arsip</option>
+                            @foreach(\App\Enums\FestivalStatus::cases() as $statusOption)
+                                <option value="{{ $statusOption->value }}" {{ old('status', $festival->status->value) === $statusOption->value ? 'selected' : '' }}>
+                                    {{ $statusOption->label() }}
+                                </option>
+                            @endforeach
                         </select>
                     </div>
                 </div>

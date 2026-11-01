@@ -34,7 +34,10 @@ class EnsureRole
         }
 
         // Check if user's role is in the allowed roles
-        $allowedRoles = array_map(fn($role) => UserRole::from($role), $roles);
+        $allowedRoles = array_map(function ($role) {
+            $role = ($role === 'admin') ? 'superadmin' : $role;
+            return UserRole::from($role);
+        }, $roles);
 
         if (! in_array($user->role, $allowedRoles, true)) {
             abort(403, 'Anda tidak memiliki akses ke halaman ini.');

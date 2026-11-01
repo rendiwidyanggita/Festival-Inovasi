@@ -33,7 +33,7 @@
                                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ $innovation->awardCategory->name ?? '-' }}</td>
                                         <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                                             <a href="{{ route('admin.innovations.edit', $innovation) }}" class="text-blue-600 hover:text-blue-900 mr-3">Edit</a>
-                                            @if(!$innovation->awardCategory->isRosterLocked())
+                                            @if(!$innovation->awardCategory?->isRosterLocked())
                                                 <form method="POST" action="{{ route('admin.innovations.destroy', $innovation) }}" class="inline" onsubmit="return confirm('Hapus inovasi ini?')">
                                                     @csrf
                                                     @method('DELETE')

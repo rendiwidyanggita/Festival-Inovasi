@@ -5,7 +5,7 @@
 
     <div class="bg-white overflow-hidden shadow-sm rounded-lg">
         <div class="p-6">
-            <form method="POST" action="{{ route('admin.award-categories.update', [$festivalCategory, $awardCategory]) }}">
+            <form method="POST" action="{{ route('admin.award-categories.update', $awardCategory) }}">
                 @csrf
                 @method('PUT')
                 

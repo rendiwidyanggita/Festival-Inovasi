@@ -38,7 +38,8 @@ class FestivalJuryController extends Controller
             ->orderBy('name')
             ->get();
 
-        return view('admin.festival-juries.create', compact('availableJuries'));
+        $juries = $availableJuries;
+        return view('admin.festival-juries.create', compact('availableJuries', 'juries'));
     }
 
     public function store(StoreRequest $request): RedirectResponse

@@ -59,6 +59,12 @@ class AwardCategory extends Model
     {
         return $this->hasMany(JurySubcategoryParticipation::class);
     }
+    /** Alias for participations relation. */
+    public function juryParticipations(): HasMany
+    {
+        return $this->participations();
+    }
+
 
     /** @return HasMany<InnovationWinner, $this> */
     public function innovationWinners(): HasMany

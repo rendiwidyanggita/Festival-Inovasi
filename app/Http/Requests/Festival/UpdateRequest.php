@@ -2,9 +2,9 @@
 
 namespace App\Http\Requests\Festival;
 
+use App\Enums\FestivalStatus;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
-
 class UpdateRequest extends FormRequest
 {
     public function authorize(): bool
@@ -18,6 +18,7 @@ class UpdateRequest extends FormRequest
 
         return [
             'name' => ['required', 'string', 'max:255'],
+            'status' => ['sometimes', 'required', Rule::enum(FestivalStatus::class)],
             'year' => [
                 'sometimes',
                 'integer',

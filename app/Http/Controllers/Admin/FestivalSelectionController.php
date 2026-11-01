@@ -14,7 +14,7 @@ class FestivalSelectionController extends Controller
      */
     public function index(): View
     {
-        $festivals = Festival::orderBy('year', 'desc')->get();
+        $festivals = Festival::orderBy('year', 'desc')->paginate(15);
         
         return view('admin.select-festival.index', compact('festivals'));
     }
@@ -24,7 +24,10 @@ class FestivalSelectionController extends Controller
      */
     public function select(Festival $festival): RedirectResponse
     {
-        session(['selected_festival_id' => $festival->id]);
+        session([
+            'selected_festival_id' => $festival->id,
+            'currentFestival' => $festival,
+        ]);
         
         return redirect()->route('admin.dashboard')
             ->with('success', "Festival {$festival->name} ({$festival->year}) dipilih.");

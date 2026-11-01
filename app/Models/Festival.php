@@ -52,6 +52,12 @@ class Festival extends Model
         return $this->hasMany(FestivalJury::class);
     }
 
+    /** @return HasMany<JurySubcategoryParticipation, $this> */
+    public function participations(): HasMany
+    {
+        return $this->hasMany(JurySubcategoryParticipation::class);
+    }
+
     /** @return HasMany<AssessmentCriterion, $this> */
     public function assessmentCriteria(): HasMany
     {

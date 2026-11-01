@@ -14,6 +14,23 @@ class AssignWinnersRequest extends FormRequest
     {
         return true;
     }
+    protected function prepareForValidation(): void
+    {
+        if ($this->has('winners') && is_array($this->winners)) {
+            $hasSelectedKey = collect($this->winners)->contains(fn ($w) => is_array($w) && array_key_exists('selected', $w));
+            
+            $filtered = array_filter($this->winners, function ($winner) use ($hasSelectedKey) {
+                if (!is_array($winner)) {
+                    return false;
+                }
+                if ($hasSelectedKey) {
+                    return !empty($winner['selected']) && !empty($winner['position']);
+                }
+                return !empty($winner['target_id']) && !empty($winner['position']);
+            });
+            $this->merge(['winners' => array_values($filtered)]);
+        }
+    }
 
     /**
      * Get the validation rules that apply to the request.

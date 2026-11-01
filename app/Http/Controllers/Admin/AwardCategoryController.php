@@ -16,16 +16,18 @@ class AwardCategoryController extends Controller
 {
     public function index(FestivalCategory $festival_category): View
     {
+        $festivalCategory = $festival_category;
         $awardCategories = AwardCategory::where('festival_category_id', $festival_category->id)
             ->orderBy('sort_order')
             ->paginate(15);
 
-        return view('admin.award-categories.index', compact('festival_category', 'awardCategories'));
+        return view('admin.award-categories.index', compact('festival_category', 'festivalCategory', 'awardCategories'));
     }
 
     public function create(FestivalCategory $festival_category): View
     {
-        return view('admin.award-categories.create', compact('festival_category'));
+        $festivalCategory = $festival_category;
+        return view('admin.award-categories.create', compact('festival_category', 'festivalCategory'));
     }
 
     public function store(StoreRequest $request, FestivalCategory $festival_category): RedirectResponse
@@ -49,8 +51,10 @@ class AwardCategoryController extends Controller
     public function edit(AwardCategory $award_category): View
     {
         $award_category->load('festivalCategory');
+        $awardCategory = $award_category;
+        $festivalCategory = $award_category->festivalCategory;
 
-        return view('admin.award-categories.edit', compact('award_category'));
+        return view('admin.award-categories.edit', compact('award_category', 'awardCategory', 'festivalCategory'));
     }
 
     public function update(UpdateRequest $request, AwardCategory $award_category): RedirectResponse
