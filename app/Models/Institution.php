@@ -1,0 +1,31 @@
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\SoftDeletes;
+
+class Institution extends Model
+{
+    use SoftDeletes;
+
+    /** @return BelongsTo<Festival, $this> */
+    public function festival(): BelongsTo
+    {
+        return $this->belongsTo(Festival::class);
+    }
+
+    /** @return BelongsTo<AwardCategory, $this> */
+    public function awardCategory(): BelongsTo
+    {
+        return $this->belongsTo(AwardCategory::class);
+    }
+
+    /** @return HasMany<Innovation, $this> */
+    public function innovations(): HasMany
+    {
+        return $this->hasMany(Innovation::class);
+    }
+}

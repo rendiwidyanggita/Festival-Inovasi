@@ -1,0 +1,74 @@
+<?php
+
+namespace App\Models;
+
+use App\Enums\FestivalStatus;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
+
+class Festival extends Model
+{
+    protected function casts(): array
+    {
+        return [
+            'status' => FestivalStatus::class,
+            'results_published_at' => 'datetime',
+        ];
+    }
+
+    /** @return HasOne<FestivalSetting, $this> */
+    public function settings(): HasOne
+    {
+        return $this->hasOne(FestivalSetting::class);
+    }
+
+    /** @return HasMany<FestivalCategory, $this> */
+    public function festivalCategories(): HasMany
+    {
+        return $this->hasMany(FestivalCategory::class);
+    }
+
+    /** @return HasMany<AwardCategory, $this> */
+    public function awardCategories(): HasMany
+    {
+        return $this->hasMany(AwardCategory::class);
+    }
+
+    /** @return HasMany<FestivalJury, $this> */
+    public function festivalJuries(): HasMany
+    {
+        return $this->hasMany(FestivalJury::class);
+    }
+
+    /** @return HasMany<AssessmentCriterion, $this> */
+    public function assessmentCriteria(): HasMany
+    {
+        return $this->hasMany(AssessmentCriterion::class);
+    }
+
+    /** @return HasMany<Institution, $this> */
+    public function institutions(): HasMany
+    {
+        return $this->hasMany(Institution::class);
+    }
+
+    /** @return HasMany<Innovation, $this> */
+    public function innovations(): HasMany
+    {
+        return $this->hasMany(Innovation::class);
+    }
+
+    /** @return BelongsTo<User, $this> */
+    public function publishedBy(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'results_published_by');
+    }
+
+    /** Publikasi hasil sudah dilakukan atau belum. */
+    public function hasPublishedResults(): bool
+    {
+        return $this->results_published_at !== null;
+    }
+}
