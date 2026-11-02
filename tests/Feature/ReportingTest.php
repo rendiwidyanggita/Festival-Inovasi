@@ -245,6 +245,9 @@ class ReportingTest extends TestCase
 
         $this->assertNull($this->festival->results_published_at);
 
+        // Publikasi mensyaratkan minimal satu pemenang yang ditetapkan
+        $this->seedWinner();
+
         $response = $this->post(route('admin.festivals.publish-results', $this->festival));
 
         $response->assertRedirect();
@@ -258,6 +261,9 @@ class ReportingTest extends TestCase
     {
         $this->actingAs($this->superadmin);
 
+        // Publikasi mensyaratkan minimal satu pemenang yang ditetapkan
+        $this->seedWinner();
+
         $response = $this->post(route('admin.festivals.publish-results', $this->festival));
 
         $response->assertRedirect();
@@ -267,6 +273,34 @@ class ReportingTest extends TestCase
             'action' => 'publish_results',
             'auditable_type' => 'festival',
             'auditable_id' => $this->festival->id,
+        ]);
+    }
+
+    public function test_publication_requires_winners()
+    {
+        $this->actingAs($this->superadmin);
+
+        $response = $this->post(route('admin.festivals.publish-results', $this->festival));
+
+        $response->assertRedirect();
+
+        $this->festival->refresh();
+        $this->assertNull($this->festival->results_published_at);
+    }
+
+    /**
+     * Seed satu pemenang inovasi untuk kebutuhan pengujian publikasi.
+     */
+    private function seedWinner(): void
+    {
+        $innovation = $this->createInnovation(['name' => 'Inovasi Pemenang']);
+        $participation = $this->createJuryParticipation($this->awardCategory);
+        $this->createLockedAssessment($innovation, $participation, 90);
+
+        $this->post(route('admin.award-categories.winners.store', $this->awardCategory), [
+            'winners' => [
+                ['target_type' => 'innovation', 'target_id' => $innovation->id, 'position' => 1],
+            ],
         ]);
     }
 
