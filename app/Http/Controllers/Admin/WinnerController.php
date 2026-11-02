@@ -8,6 +8,7 @@ use App\Models\AwardCategory;
 use App\Models\Festival;
 use App\Models\InnovationWinner;
 use App\Models\InstitutionWinner;
+use App\Services\AuditService;
 use App\Services\RankingService;
 use App\Services\WinnerService;
 use Illuminate\Http\RedirectResponse;
@@ -106,6 +107,9 @@ class WinnerController extends Controller
         $winnerModel = $winnerType === 'innovation' ? InnovationWinner::class : InstitutionWinner::class;
         $winner = $winnerModel::findOrFail($winnerId);
 
+        // Tangkap nilai lama SEBELUM update agar audit tidak mencatat old == new
+        $oldValues = $winner->only(['position', 'notes']);
+
         try {
             $winner->update([
                 'position' => $request->position,
@@ -116,8 +120,8 @@ class WinnerController extends Controller
                 $request->user(),
                 $winner,
                 'update_winner',
-                $winner->getOriginal(),
-                $winner->fresh()->toArray()
+                $oldValues,
+                $winner->only(['position', 'notes'])
             );
 
             return back()->with('success', 'Data pemenang berhasil diperbarui.');
