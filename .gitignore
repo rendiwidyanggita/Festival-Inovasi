@@ -12,6 +12,12 @@
 /.phpunit.cache
 /.vscode
 /.zed
+/.agents/
+/.claude/
+/.pi/
+/.mcp.json
+/boost.json
+/opencode.json
 /auth.json
 /node_modules
 /public/build
