@@ -72,42 +72,73 @@ class ParticipationController extends Controller
             'award_categories.*' => ['exists:award_categories,id'],
         ]);
 
-        // Verify all selected categories are in preparation status
-        $categories = AwardCategory::where('festival_id', $festival->id)
-            ->whereIn('id', $selectedIds)
-            ->get();
+        // Partisipasi yang sudah dimiliki juri pada festival ini
+        $existingCategoryIds = JurySubcategoryParticipation::where('festival_jury_id', $festivalJury->id)
+            ->where('festival_id', $festival->id)
+            ->pluck('award_category_id');
 
-        $notPreparation = $categories->filter(
-            fn ($c) => $c->scoring_status !== ScoringStatus::Preparation
+        // Hanya kategori BARU (belum menjadi partisipasi) yang wajib preparation;
+        // kategori yang sudah ada boleh dipertahankan meski sudah dibuka/ditutup.
+        $newCategoryIds = collect($selectedIds)->reject(
+            fn ($id) => $existingCategoryIds->contains((int) $id)
         );
+
+        $notPreparation = AwardCategory::where('festival_id', $festival->id)
+            ->whereIn('id', $newCategoryIds)
+            ->where('scoring_status', '!=', ScoringStatus::Preparation->value)
+            ->pluck('name');
 
         if ($notPreparation->isNotEmpty()) {
             return back()->withErrors([
-                'award_categories' => 'Beberapa subkategori sudah tidak dapat dipilih.',
+                'award_categories' => 'Subkategori berikut sudah tidak dapat dipilih: ' . $notPreparation->implode(', ') . '.',
             ]);
         }
 
-        DB::transaction(function () use ($festival, $festivalJury, $selectedIds) {
-            // Remove participations not in the new selection
-            JurySubcategoryParticipation::where('festival_jury_id', $festivalJury->id)
-                ->where('festival_id', $festival->id)
-                ->whereNotIn('award_category_id', $selectedIds)
-                ->delete();
+        // Roster juri terkunci setelah subkategori dibuka: participasi pada
+        // subkategori non-preparation tidak boleh dilepas (protected dari FK restrict
+        // dan dari hilangnya data penilaian yang sudah ada).
+        $lockedParticipations = JurySubcategoryParticipation::with('awardCategory')
+            ->where('festival_jury_id', $festivalJury->id)
+            ->where('festival_id', $festival->id)
+            ->whereNotIn('award_category_id', $selectedIds)
+            ->whereHas('awardCategory', fn ($q) => $q->where('scoring_status', '!=', ScoringStatus::Preparation->value))
+            ->get();
 
-            // Create new participations
-            foreach ($selectedIds as $categoryId) {
-                JurySubcategoryParticipation::firstOrCreate(
-                    [
-                        'festival_jury_id' => $festivalJury->id,
-                        'festival_id' => $festival->id,
-                        'award_category_id' => $categoryId,
-                    ],
-                    [
-                        'status' => ParticipationStatus::Selected,
-                    ]
-                );
-            }
-        });
+        if ($lockedParticipations->isNotEmpty()) {
+            $names = $lockedParticipations->pluck('awardCategory.name')->implode(', ');
+
+            return back()->withErrors([
+                'award_categories' => "Subkategori {$names} sudah dibuka/ditutup sehingga penugasan tidak dapat dilepas.",
+            ]);
+        }
+
+        try {
+            DB::transaction(function () use ($festival, $festivalJury, $selectedIds) {
+                // Remove participations not in the new selection
+                JurySubcategoryParticipation::where('festival_jury_id', $festivalJury->id)
+                    ->where('festival_id', $festival->id)
+                    ->whereNotIn('award_category_id', $selectedIds)
+                    ->delete();
+
+                // Create new participations
+                foreach ($selectedIds as $categoryId) {
+                    JurySubcategoryParticipation::firstOrCreate(
+                        [
+                            'festival_jury_id' => $festivalJury->id,
+                            'festival_id' => $festival->id,
+                            'award_category_id' => $categoryId,
+                        ],
+                        [
+                            'status' => ParticipationStatus::Selected,
+                        ]
+                    );
+                }
+            });
+        } catch (\Illuminate\Database\QueryException $e) {
+            return back()->withErrors([
+                'award_categories' => 'Penugasan tidak dapat diperbarui karena sudah ada data penilaian.',
+            ]);
+        }
 
         return redirect()->route('jury.participations.index', $festival)
             ->with('success', 'Pilihan subkategori berhasil diperbarui.');
