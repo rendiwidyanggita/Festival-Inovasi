@@ -41,14 +41,20 @@ class RankingService
             ];
         });
 
-        // Sort by average score DESC and assign ranks
-        return $rankings
-            ->sortByDesc('average_score')
-            ->values()
-            ->map(function ($item, $index) {
-                $item->rank = $index + 1;
-                return $item;
-            });
+        // Sort by average score DESC and assign ranks.
+        // Skor sama mendapat peringkat seri (competition ranking: 1, 1, 3).
+        $sorted = $rankings->sortByDesc('average_score')->values();
+
+        $lastScore = null;
+        $lastRank = 0;
+        return $sorted->map(function ($item, $index) use (&$lastScore, &$lastRank) {
+            $item->rank = ($lastScore !== null && (float) $item->average_score === $lastScore)
+                ? $lastRank
+                : $index + 1;
+            $lastScore = (float) $item->average_score;
+            $lastRank = $item->rank;
+            return $item;
+        });
     }
 
     /**

@@ -6,6 +6,7 @@ use App\Models\AwardCategory;
 use App\Models\InnovationWinner;
 use App\Models\InstitutionWinner;
 use App\Models\User;
+use App\Enums\ScoringStatus;
 use Exception;
 use Illuminate\Support\Facades\DB;
 
@@ -60,6 +61,24 @@ class WinnerService
      */
     public function assignWinners(AwardCategory $category, array $winners, User $actor): void
     {
+        // Pemenang hanya dapat ditetapkan setelah periode penilaian ditutup
+        // agar total_score berasal dari hasil penilaian yang final.
+        if ($category->scoring_status !== ScoringStatus::Closed) {
+            throw new Exception('Tutup periode penilaian subkategori terlebih dahulu sebelum menetapkan pemenang.');
+        }
+
+        // Validasi setiap target benar-benar anggota subkategori ini
+        $isInnovation = $category->festivalCategory->assessment_type->value === 'innovation';
+        foreach ($winners as $winner) {
+            $exists = $isInnovation
+                ? $category->innovations()->where('id', $winner['target_id'])->exists()
+                : $category->institutions()->where('id', $winner['target_id'])->exists();
+
+            if (! $exists) {
+                throw new Exception('Salah satu peserta tidak terdaftar dalam subkategori ini.');
+            }
+        }
+
         $this->validateWinnerCount($category, $winners);
 
         DB::transaction(function () use ($category, $winners, $actor) {
