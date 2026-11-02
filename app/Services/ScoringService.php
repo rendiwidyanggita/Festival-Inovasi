@@ -203,8 +203,12 @@ class ScoringService
     }
 
     /**
-     * Calculate average score for a target across all juries.
-     * Formula: total weighted scores / number of juries who assessed
+     * Calculate average score for a target across all juries (monitoring in-flight).
+     * Formula: total weighted scores / number of juries who assessed.
+     *
+     * CATATAN: berbeda dari RankingService::calculateAverageScore yang HANYA
+     * menghitung penilaian Locked untuk hasil akhir. Method ini menghitung
+     * Submitted + Locked untuk kebutuhan pemantauan berjalan.
      */
     public function calculateAverageScore(Innovation|Institution $target): float
     {
@@ -237,6 +241,12 @@ class ScoringService
     ): InnovationAssessment|InstitutionAssessment {
         $isInnovation = $target instanceof Innovation;
         $assessmentType = $isInnovation ? AssessmentType::Innovation : AssessmentType::Institution;
+
+        // Penilaian hanya boleh dilakukan selama periode scoring subkategori terbuka
+        $category = $participation->awardCategory;
+        if ($category->scoring_status !== ScoringStatus::Open) {
+            throw new Exception('Periode penilaian untuk subkategori ini belum dibuka atau sudah ditutup.');
+        }
 
         // Get criteria for this assessment type
         $criteria = AssessmentCriterion::where('festival_id', $participation->festival_id)
@@ -369,13 +379,14 @@ class ScoringService
             ? $category->innovations()->count()
             : $category->institutions()->count();
 
-        // Get submitted assessments count
+        // Get submitted/locked assessments count (locked dihitung selesai karena
+        // admin telah menerima penilaian tersebut)
         $submittedCount = $isInnovation
             ? $participation->innovationAssessments()
-                ->where('status', AssessmentStatus::Submitted)
+                ->whereIn('status', [AssessmentStatus::Submitted, AssessmentStatus::Locked])
                 ->count()
             : $participation->institutionAssessments()
-                ->where('status', AssessmentStatus::Submitted)
+                ->whereIn('status', [AssessmentStatus::Submitted, AssessmentStatus::Locked])
                 ->count();
 
         // Update participation completion if all assessed
