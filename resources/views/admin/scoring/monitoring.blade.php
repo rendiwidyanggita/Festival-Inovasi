@@ -92,7 +92,7 @@
                             <form method="POST" action="{{ route('admin.award-categories.close-scoring', $selectedSubcategory) }}" class="inline">
                                 @csrf
                                 <button type="submit" 
-                                        onclick="return confirm('Tutup penilaian untuk subkategori ini? Seluruh juri tidak dapat mengubah nilai lagi.')"
+                                        onclick="return confirmSubmit(event, 'Seluruh juri tidak dapat mengubah nilai lagi. Pastikan semua penilaian sudah dikunci sebelum menutup.', { title: 'Tutup Penilaian', confirmText: 'Ya, Tutup Penilaian' })"
                                         class="inline-flex items-center gap-2 px-4 py-2.5 bg-rose-600 hover:bg-rose-700 text-white font-semibold text-xs rounded-xl shadow-md shadow-rose-600/30 transition-all duration-150 active:scale-[0.96]">
                                     <svg class="size-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
@@ -217,7 +217,7 @@
                                                                 <form method="POST" action="{{ route('admin.assessments.lock', [$assessmentType, $assessmentData['id'] ?? $object->id]) }}" class="inline">
                                                                     @csrf
                                                                     <button type="submit" 
-                                                                            onclick="return confirm('Kunci penilaian ini?')"
+                                                                            onclick="return confirmSubmit(event, 'Penilaian terkunci menjadi dasar perhitungan ranking dan tidak dapat diubah juri.', { title: 'Kunci Penilaian', confirmText: 'Ya, Kunci', danger: false })"
                                                                             title="Kunci Penilaian"
                                                                             class="text-[10px] font-semibold px-2 py-0.5 bg-purple-50 hover:bg-purple-100 text-purple-700 rounded-md border border-purple-200 transition-colors">
                                                                         Kunci

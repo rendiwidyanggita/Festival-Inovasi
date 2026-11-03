@@ -232,7 +232,7 @@
 <script>
     // Live weighted score calculator
     const criteria = @json($criteria->mapWithKeys(function($c) {
-        return [$c->id => ['weight' => $c->weight]];
+        return [$c->id => ['weight' => $c->weight, 'name' => $c->name]];
     }));
 
     function calculateWeightedScore() {
@@ -286,20 +286,35 @@
         form.submit();
     }
 
-    // Form validation before final submit
+    // Form validation before final submit — memakai modal global, bukan alert()/confirm() native
     document.getElementById('assessmentForm').addEventListener('submit', function(e) {
-        if (this.action.includes('/submit')) {
-            const allFilled = calculateWeightedScore();
-            
-            if (!allFilled) {
-                e.preventDefault();
-                alert('Harap isi nilai untuk semua kriteria penilaian sebelum mengirim penilaian final.');
-            } else {
-                if (!confirm('Apakah Anda yakin ingin mengirim penilaian final? Penilaian yang sudah dikirim tidak dapat diubah kecuali diminta revisi oleh superadmin.')) {
-                    e.preventDefault();
-                }
-            }
+        if (!this.action.includes('/submit')) {
+            return; // form terkunci (action '#') — biarkan
         }
+
+        // Kumpulkan kriteria yang belum dinilai agar pesan modal spesifik
+        const missing = Object.keys(criteria).filter(criterionId => {
+            return !document.querySelector(`input[name="criteria[${criterionId}]"]:checked`);
+        }).map(criterionId => criteria[criterionId].name || ('Kriteria #' + criterionId));
+
+        if (missing.length > 0) {
+            e.preventDefault();
+            appAlert({
+                title: 'Penilaian Belum Lengkap',
+                message: 'Harap isi nilai (6-10) untuk semua kriteria sebelum mengirim penilaian final. Belum diisi: ' + missing.join(', ') + '.',
+            });
+            return;
+        }
+
+        e.preventDefault();
+        appConfirm({
+            title: 'Kirim Penilaian Final',
+            message: 'Apakah Anda yakin ingin mengirim penilaian final? Penilaian yang sudah dikirim tidak dapat diubah kecuali diminta revisi oleh superadmin.',
+            confirmText: 'Ya, Kirim Final',
+            danger: false,
+        }).then((ok) => {
+            if (ok) e.target.submit(); // submit() native tidak memicu handler ini lagi
+        });
     });
 
     // Initial calculation on page load

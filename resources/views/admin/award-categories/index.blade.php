@@ -47,7 +47,7 @@
                                     <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                                         <a href="{{ route('admin.award-categories.edit', $awardCategory) }}" class="text-blue-600 hover:text-blue-900 mr-3">Edit</a>
                                         @if($awardCategory->scoring_status->value === 'preparation')
-                                            <form method="POST" action="{{ route('admin.award-categories.destroy', $awardCategory) }}" class="inline" onsubmit="return confirm('Hapus subkategori ini?')">
+                                            <form method="POST" action="{{ route('admin.award-categories.destroy', $awardCategory) }}" class="inline" onsubmit="return confirmSubmit(event, 'Subkategori yang dihapus tidak dapat dikembalikan.', { title: 'Hapus Subkategori' })">
                                                 @csrf
                                                 @method('DELETE')
                                                 <button type="submit" class="text-red-600 hover:text-red-900">Hapus</button>

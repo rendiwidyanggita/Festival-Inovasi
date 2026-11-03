@@ -30,7 +30,7 @@
                                         <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                                             <a href="{{ route('admin.institutions.edit', $institution) }}" class="text-blue-600 hover:text-blue-900 mr-3">Edit</a>
                                             @if(!$institution->awardCategory?->isRosterLocked())
-                                                <form method="POST" action="{{ route('admin.institutions.destroy', $institution) }}" class="inline" onsubmit="return confirm('Hapus instansi ini?')">
+                                                <form method="POST" action="{{ route('admin.institutions.destroy', $institution) }}" class="inline" onsubmit="return confirmSubmit(event, 'Instansi yang dihapus tidak dapat dikembalikan.', { title: 'Hapus Instansi' })">
                                                     @csrf
                                                     @method('DELETE')
                                                     <button type="submit" class="text-red-600 hover:text-red-900">Hapus</button>

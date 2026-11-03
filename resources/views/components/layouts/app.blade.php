@@ -602,5 +602,142 @@
             }
         }
     </script>
+
+    <!-- Global Modal Dialogs (pengganti alert()/confirm() native) -->
+    <div id="appDialogBackdrop" class="fixed inset-0 bg-slate-950/60 backdrop-blur-xs hidden items-center justify-center z-[70] p-4">
+        <!-- Confirm -->
+        <div id="appConfirmDialog" class="hidden w-full max-w-md bg-white rounded-2xl shadow-2xl p-6" role="dialog" aria-modal="true">
+            <div class="flex items-start gap-4">
+                <div id="appConfirmIcon" class="shrink-0 w-11 h-11 rounded-full flex items-center justify-center bg-red-100">
+                    <svg id="appConfirmIconDanger" class="w-5 h-5 text-red-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v4m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z" />
+                    </svg>
+                    <svg id="appConfirmIconInfo" class="hidden w-5 h-5 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                </div>
+                <div class="flex-1 min-w-0">
+                    <h3 id="appConfirmTitle" class="text-base font-bold text-slate-900">Konfirmasi</h3>
+                    <p id="appConfirmMessage" class="mt-1.5 text-sm text-slate-600 leading-relaxed"></p>
+                </div>
+            </div>
+            <div class="mt-6 flex items-center justify-end gap-2.5">
+                <button type="button" id="appConfirmCancel" class="px-4 py-2 text-sm font-semibold text-slate-700 bg-white border border-slate-200 rounded-xl hover:bg-slate-50 transition-colors">
+                    Batal
+                </button>
+                <button type="button" id="appConfirmOk" class="px-4 py-2 text-sm font-semibold text-white bg-red-600 border border-red-600 rounded-xl hover:bg-red-700 transition-colors">
+                    Ya, Lanjutkan
+                </button>
+            </div>
+        </div>
+
+        <!-- Alert -->
+        <div id="appAlertDialog" class="hidden w-full max-w-md bg-white rounded-2xl shadow-2xl p-6" role="alertdialog" aria-modal="true">
+            <div class="flex items-start gap-4">
+                <div id="appAlertIcon" class="shrink-0 w-11 h-11 rounded-full flex items-center justify-center bg-amber-100">
+                    <svg class="w-5 h-5 text-amber-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v4m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z" />
+                    </svg>
+                </div>
+                <div class="flex-1 min-w-0">
+                    <h3 id="appAlertTitle" class="text-base font-bold text-slate-900">Perhatian</h3>
+                    <p id="appAlertMessage" class="mt-1.5 text-sm text-slate-600 leading-relaxed"></p>
+                </div>
+            </div>
+            <div class="mt-6 flex items-center justify-end">
+                <button type="button" id="appAlertOk" class="px-4 py-2 text-sm font-semibold text-white bg-slate-900 border border-slate-900 rounded-xl hover:bg-slate-800 transition-colors">
+                    Mengerti
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Dialog modal global berbasis Promise — pengganti alert()/confirm() native.
+        (function () {
+            const backdrop = document.getElementById('appDialogBackdrop');
+
+            function show(el) {
+                backdrop.classList.remove('hidden');
+                backdrop.classList.add('flex');
+                el.classList.remove('hidden');
+            }
+
+            function hide(el) {
+                el.classList.add('hidden');
+                backdrop.classList.add('hidden');
+                backdrop.classList.remove('flex');
+            }
+
+            let activeConfirm = null; // { resolve }
+
+            window.appConfirm = function ({ title = 'Konfirmasi', message = '', confirmText = 'Ya, Lanjutkan', cancelText = 'Batal', danger = true }) {
+                return new Promise((resolve) => {
+                    if (activeConfirm) activeConfirm.resolve(false);
+                    activeConfirm = { resolve };
+
+                    document.getElementById('appConfirmTitle').textContent = title;
+                    document.getElementById('appConfirmMessage').textContent = message;
+                    document.getElementById('appConfirmOk').textContent = confirmText;
+                    document.getElementById('appConfirmCancel').textContent = cancelText;
+
+                    const okBtn = document.getElementById('appConfirmOk');
+                    okBtn.className = danger
+                        ? 'px-4 py-2 text-sm font-semibold text-white bg-red-600 border border-red-600 rounded-xl hover:bg-red-700 transition-colors'
+                        : 'px-4 py-2 text-sm font-semibold text-white bg-blue-600 border border-blue-600 rounded-xl hover:bg-blue-700 transition-colors';
+                    document.getElementById('appConfirmIcon').className = danger
+                        ? 'shrink-0 w-11 h-11 rounded-full flex items-center justify-center bg-red-100'
+                        : 'shrink-0 w-11 h-11 rounded-full flex items-center justify-center bg-blue-100';
+                    document.getElementById('appConfirmIconDanger').classList.toggle('hidden', !danger);
+                    document.getElementById('appConfirmIconInfo').classList.toggle('hidden', danger);
+
+                    show(document.getElementById('appConfirmDialog'));
+                    document.getElementById('appConfirmOk').focus();
+                });
+            };
+
+            window.appAlert = function ({ title = 'Perhatian', message = '' }) {
+                return new Promise((resolve) => {
+                    document.getElementById('appAlertTitle').textContent = title;
+                    document.getElementById('appAlertMessage').textContent = message;
+                    show(document.getElementById('appAlertDialog'));
+                    document.getElementById('appAlertOk').focus();
+                    document.getElementById('appAlertOk').onclick = () => {
+                        hide(document.getElementById('appAlertDialog'));
+                        resolve();
+                    };
+                });
+            };
+
+            function settleConfirm(result) {
+                if (!activeConfirm) return;
+                hide(document.getElementById('appConfirmDialog'));
+                activeConfirm.resolve(result);
+                activeConfirm = null;
+            }
+
+            document.getElementById('appConfirmOk').addEventListener('click', () => settleConfirm(true));
+            document.getElementById('appConfirmCancel').addEventListener('click', () => settleConfirm(false));
+            backdrop.addEventListener('click', (e) => { if (e.target === backdrop) settleConfirm(false); });
+            document.addEventListener('keydown', (e) => {
+                if (e.key !== 'Escape') return;
+                if (activeConfirm) settleConfirm(false);
+                const alertBox = document.getElementById('appAlertDialog');
+                if (!alertBox.classList.contains('hidden')) {
+                    hide(alertBox);
+                }
+            });
+
+            // Helper untuk form: onsubmit="return confirmSubmit(event, 'pesan')"
+            window.confirmSubmit = function (event, message, options = {}) {
+                event.preventDefault();
+                const form = event.target.closest('form');
+                appConfirm(Object.assign({ message }, options)).then((ok) => {
+                    if (ok && form) form.submit(); // submit() native tidak memicu handler lagi
+                });
+                return false;
+            };
+        })();
+    </script>
 </body>
 </html>

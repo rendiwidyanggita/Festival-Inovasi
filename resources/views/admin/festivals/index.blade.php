@@ -105,7 +105,10 @@
                     if (response.status === 422 && data.errors) {
                         this.errors = data.errors;
                     } else {
-                        alert(data.message || 'Terjadi kesalahan saat memproses data.');
+                        appAlert({
+                            title: 'Gagal Memproses Data',
+                            message: data.message || 'Terjadi kesalahan saat memproses data.',
+                        });
                     }
                     this.submitting = false;
                     return;

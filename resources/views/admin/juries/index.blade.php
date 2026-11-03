@@ -52,7 +52,7 @@
                                             </form>
                                         @else
                                             <a href="{{ route('admin.juries.edit', $jury) }}" class="text-blue-600 hover:text-blue-900 mr-3">Edit</a>
-                                            <form method="POST" action="{{ route('admin.juries.destroy', $jury) }}" class="inline" onsubmit="return confirm('Hapus juri ini?')">
+                                            <form method="POST" action="{{ route('admin.juries.destroy', $jury) }}" class="inline" onsubmit="return confirmSubmit(event, 'Akun juri akan dinonaktifkan (soft delete) dan dapat dipulihkan kembali.', { title: 'Hapus Akun Juri', danger: false })">
                                                 @csrf
                                                 @method('DELETE')
                                                 <button type="submit" class="text-red-600 hover:text-red-900">Hapus</button>

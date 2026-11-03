@@ -39,7 +39,7 @@
                                             <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                                                 <a href="{{ route('admin.assessment-criteria.edit', $criterion) }}" class="text-blue-600 hover:text-blue-900 mr-3">Edit</a>
                                                 @if($criterion->innovationAssessmentDetails()->count() === 0 && $criterion->institutionAssessmentDetails()->count() === 0)
-                                                    <form method="POST" action="{{ route('admin.assessment-criteria.destroy', $criterion) }}" class="inline" onsubmit="return confirm('Hapus kriteria ini?')">
+                                                    <form method="POST" action="{{ route('admin.assessment-criteria.destroy', $criterion) }}" class="inline" onsubmit="return confirmSubmit(event, 'Kriteria yang dihapus tidak dapat dikembalikan.', { title: 'Hapus Kriteria' })">
                                                         @csrf
                                                         @method('DELETE')
                                                         <button type="submit" class="text-red-600 hover:text-red-900">Hapus</button>
@@ -81,7 +81,7 @@
                                             <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                                                 <a href="{{ route('admin.assessment-criteria.edit', $criterion) }}" class="text-blue-600 hover:text-blue-900 mr-3">Edit</a>
                                                 @if($criterion->innovationAssessmentDetails()->count() === 0 && $criterion->institutionAssessmentDetails()->count() === 0)
-                                                    <form method="POST" action="{{ route('admin.assessment-criteria.destroy', $criterion) }}" class="inline" onsubmit="return confirm('Hapus kriteria ini?')">
+                                                    <form method="POST" action="{{ route('admin.assessment-criteria.destroy', $criterion) }}" class="inline" onsubmit="return confirmSubmit(event, 'Kriteria yang dihapus tidak dapat dikembalikan.', { title: 'Hapus Kriteria' })">
                                                         @csrf
                                                         @method('DELETE')
                                                         <button type="submit" class="text-red-600 hover:text-red-900">Hapus</button>

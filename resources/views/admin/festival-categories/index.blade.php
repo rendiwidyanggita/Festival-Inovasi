@@ -38,7 +38,7 @@
                                         <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                                             <a href="{{ route('admin.award-categories.index', $category) }}" class="text-green-600 hover:text-green-900 mr-3">Subkategori</a>
                                             <a href="{{ route('admin.festival-categories.edit', $category) }}" class="text-blue-600 hover:text-blue-900 mr-3">Edit</a>
-                                            <form method="POST" action="{{ route('admin.festival-categories.destroy', $category) }}" class="inline" onsubmit="return confirm('Hapus kategori ini?')">
+                                            <form method="POST" action="{{ route('admin.festival-categories.destroy', $category) }}" class="inline" onsubmit="return confirmSubmit(event, 'Kategori yang dihapus tidak dapat dikembalikan.', { title: 'Hapus Kategori' })">
                                                 @csrf
                                                 @method('DELETE')
                                                 <button type="submit" class="text-red-600 hover:text-red-900">Hapus</button>

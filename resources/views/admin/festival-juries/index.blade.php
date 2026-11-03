@@ -42,7 +42,7 @@
                                         </td>
                                         <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                                             @if($festivalJury->participations()->count() === 0)
-                                                <form method="POST" action="{{ route('admin.festival-juries.destroy', $festivalJury) }}" class="inline" onsubmit="return confirm('Hapus juri dari festival ini?')">
+                                                <form method="POST" action="{{ route('admin.festival-juries.destroy', $festivalJury) }}" class="inline" onsubmit="return confirmSubmit(event, 'Juri akan dilepaskan dari penugasan festival ini.', { title: 'Lepas Penugasan Juri' })">
                                                     @csrf
                                                     @method('DELETE')
                                                     <button type="submit" class="text-red-600 hover:text-red-900">Hapus</button>

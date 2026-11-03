@@ -34,7 +34,7 @@
                                         <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                                             <a href="{{ route('admin.innovations.edit', $innovation) }}" class="text-blue-600 hover:text-blue-900 mr-3">Edit</a>
                                             @if(!$innovation->awardCategory?->isRosterLocked())
-                                                <form method="POST" action="{{ route('admin.innovations.destroy', $innovation) }}" class="inline" onsubmit="return confirm('Hapus inovasi ini?')">
+                                                <form method="POST" action="{{ route('admin.innovations.destroy', $innovation) }}" class="inline" onsubmit="return confirmSubmit(event, 'Inovasi yang dihapus tidak dapat dikembalikan.', { title: 'Hapus Inovasi' })">
                                                     @csrf
                                                     @method('DELETE')
                                                     <button type="submit" class="text-red-600 hover:text-red-900">Hapus</button>
