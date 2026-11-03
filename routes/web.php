@@ -87,7 +87,8 @@ Route::middleware(['auth', 'role:superadmin', 'festival'])->prefix('admin')->nam
     Route::get('/scoring/monitoring', [Admin\ScoringMonitoringController::class, 'index'])->name('scoring.monitoring');
 });
 // Jury routes
-Route::middleware(['auth', 'role:jury'])->prefix('jury')->name('jury.')->group(function () {
+// Jury routes ('festival' men-share currentFestival agar menu Pilih Subkategori tampil di sidebar)
+Route::middleware(['auth', 'role:jury', 'festival'])->prefix('jury')->name('jury.')->group(function () {
     Route::get('/', Jury\DashboardController::class)->name('dashboard');
     
     // Participations (Subcategory Selection)

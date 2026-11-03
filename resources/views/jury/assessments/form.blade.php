@@ -266,6 +266,10 @@
         radio.addEventListener('change', calculateWeightedScore);
     });
 
+    // Hitung sekali saat halaman dimuat agar nilai tersimpan (termasuk form
+    // yang sudah terkirim/terkunci) langsung tampil di live preview
+    calculateWeightedScore();
+
     // Save draft function
     function saveDraft() {
         const form = document.getElementById('assessmentForm');

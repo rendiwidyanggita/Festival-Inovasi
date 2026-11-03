@@ -57,7 +57,13 @@
                                                                 {{ $isAlreadySelected ? 'checked' : '' }}
                                                                 class="focus:ring-blue-500 h-4 w-4 text-blue-600 border-gray-300 rounded cursor-pointer">
                                                         @else
-                                                            <input type="checkbox" 
+                                                            {{-- Checkbox disabled tidak dikirim browser; hidden input
+                                                                 menjaga subkategori terkunci tetap ada dalam seleksi
+                                                                 agar tidak dianggap dilepas saat sinkronisasi --}}
+                                                            @if($isAlreadySelected)
+                                                                <input type="hidden" name="subcategories[]" value="{{ $awardCategory->id }}">
+                                                            @endif
+                                                            <input type="checkbox"
                                                                 disabled
                                                                 {{ $isAlreadySelected ? 'checked' : '' }}
                                                                 class="h-4 w-4 text-gray-400 border-gray-300 rounded cursor-not-allowed">
