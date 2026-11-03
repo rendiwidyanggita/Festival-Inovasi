@@ -226,9 +226,8 @@
             </div>
         </form>
     </div>
-</x-layouts.app>
 
-@push('scripts')
+    @push('scripts')
 <script>
     // Live weighted score calculator
     const criteria = @json($criteria->mapWithKeys(function($c) {
@@ -321,3 +320,4 @@
     document.addEventListener('DOMContentLoaded', calculateWeightedScore);
 </script>
 @endpush
+</x-layouts.app>
