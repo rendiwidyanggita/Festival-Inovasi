@@ -577,6 +577,9 @@
         </div>
     </div>
 
+    {{-- Script tambahan per halaman (monitoring, form penilaian, rankings, dll.) --}}
+    @stack('scripts')
+
     <!-- Toggle Script -->
     <script>
         function toggleSidebar() {
