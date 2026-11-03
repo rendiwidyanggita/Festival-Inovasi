@@ -20,6 +20,11 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        // Pagination tema terang kustom: view bawaan Laravel memakai varian
+        // dark: Tailwind yang aktif saat OS pengguna dark mode.
+        \Illuminate\Pagination\Paginator::defaultView('vendor.pagination.light');
+        \Illuminate\Pagination\Paginator::defaultSimpleView('vendor.pagination.light');
+
         // Alias stabil untuk audit_logs.auditable_type — jangan bergantung pada
         // nama class PHP yang bisa berubah saat refactor (BUSINESS_RULES §11).
         Relation::enforceMorphMap([

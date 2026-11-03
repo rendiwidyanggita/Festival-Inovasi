@@ -17,6 +17,25 @@
             transition: opacity 0.2s ease, transform 0.2s ease, width 0.3s ease;
         }
         
+        /* Scrollbar vertikal tipis & tak menonjol untuk nav sidebar */
+        .sidebar-nav-scroll {
+            scrollbar-width: thin;
+            scrollbar-color: #e2e8f0 transparent;
+        }
+        .sidebar-nav-scroll::-webkit-scrollbar {
+            width: 6px;
+        }
+        .sidebar-nav-scroll::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .sidebar-nav-scroll::-webkit-scrollbar-thumb {
+            background: #e2e8f0;
+            border-radius: 9999px;
+        }
+        .sidebar-nav-scroll::-webkit-scrollbar-thumb:hover {
+            background: #cbd5e1;
+        }
+
         /* Collapsed Sidebar Styles */
         body.sidebar-collapsed #app-sidebar {
             width: 5rem !important; /* 80px */
@@ -120,7 +139,7 @@
                 </div>
 
                 <!-- Navigation Links List -->
-                <nav class="p-3 space-y-6 overflow-y-auto max-h-[calc(100vh-8.5rem)] scrollbar-thin scrollbar-thumb-slate-200">
+                <nav class="p-3 space-y-6 overflow-y-auto overflow-x-hidden max-h-[calc(100vh-8.5rem)] sidebar-nav-scroll">
                     
                     @if(auth()->user()->isSuperadmin())
                         <!-- Section: UTAMA -->
