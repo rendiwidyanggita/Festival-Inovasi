@@ -1,58 +1,196 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# 🏆 Festival Inovasi
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+Aplikasi web manajemen **Festival & Kompetisi Inovasi** (ASN Terinovatif & Lembaga/Instansi Terinovatif) — dari pengelolaan peserta, penugasan dewan juri, penilaian tertimbang, hingga penetapan pemenang dan publikasi hasil ke publik.
 
-## About Laravel
+Dibangun dengan **Laravel 13** (PHP 8.3+) dan frontend **Tailwind CSS 4 + Alpine.js**.
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+---
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+## ✨ Fitur Utama
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+| Modul | Deskripsi |
+|---|---|
+| 🏠 **Portal Publik** | Landing page, detail festival & subkategori, hasil juara tampil setelah dipublikasi |
+| 🗓️ **Manajemen Festival** | Periode festival per tahun, kategori utama (Inovasi/Instansi) & subkategori dengan kuota juara |
+| 🏢 **Master Data** | Instansi, inovasi (beserta innovator), kriteria & bobot penilaian (total wajib 100%) |
+| 👥 **Manajemen Juri** | Akun juri (soft delete + restore), penugasan juri per festival, aktif/nonaktif |
+| ✍️ **Pemilihan Subkategori** | Juri memilih subkategori yang akan dinilai (roster terkunci saat penilaian dibuka) |
+| 🧮 **Penilaian Tertimbang** | Juri memberi nilai bulat 6–10 per kriteria; total = Σ(nilai × bobot) ÷ 100; draft & kirim final |
+| 📊 **Monitoring Real-Time** | Matriks progres per juri × per objek; admin dapat **mengunci** (menyahkan) atau **meminta revisi** penilaian dengan catatan |
+| 🏅 **Penetapan Pemenang** | Ranking otomatis (rata-rata antar-juri dari penilaian terkunci, skor sama = peringkat seri), validasi kuota & posisi |
+| 📄 **Laporan & Publikasi** | Preview + unduh PDF per subkategori; publikasi hasil ke halaman publik |
+| 🧾 **Audit Trail** | Semua aksi penting tercatat di `audit_logs` (aktor, nilai lama/baru, IP) |
 
-## Learning Laravel
+### Alur Kerja (Lifecycle)
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
-
-In addition, [Laracasts](https://laracasts.com) contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
-
-You can also watch bite-sized lessons with real-world projects on [Laravel Learn](https://laravel.com/learn), where you will be guided through building a Laravel application from scratch while learning PHP fundamentals.
-
-## Agentic Development
-
-Laravel's predictable structure and conventions make it ideal for AI coding agents like Claude Code, Cursor, and GitHub Copilot. Install [Laravel Boost](https://laravel.com/docs/ai) to supercharge your AI workflow:
-
-```bash
-composer require laravel/boost --dev
-
-php artisan boost:install
+```
+Persiapan ──▶ Buka Penilaian ──▶ Juri Menilai ──▶ Kunci/Revisi ──▶ Tutup Penilaian
+                                                                  ──▶ Tetapkan Pemenang ──▶ Publikasi
 ```
 
-Boost provides your agent 15+ tools and skills that help agents build Laravel applications while following best practices.
+1. **Persiapan** — admin menyiapkan data; juri memilih subkategori (status `preparation`).
+2. **Buka Penilaian** — roster juri terkunci; juri mulai menilai (draft → kirim final).
+3. **Monitoring** — admin memantau progres, mengunci penilaian yang disahkan, atau meminta revisi (alasan tampil di form juri). *Hanya penilaian terkunci yang masuk perhitungan ranking.*
+4. **Tutup Penilaian** — tidak ada lagi perubahan nilai (dijaga backend).
+5. **Pemenang & Publikasi** — tetapkan juara (maks kuota, posisi unik), publikasikan hasil.
 
-## Contributing
+---
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+## 🧰 Prasyarat
 
-## Code of Conduct
+| Tools | Versi | Catatan |
+|---|---|---|
+| PHP | **>= 8.3** (dikembangkan di 8.5) | ekstensi: `pdo_mysql`, `mbstring`, `dom`, `xml`, `gd` (render PDF), `openssl`, `curl` |
+| Composer | 2.x | |
+| Node.js | **>= 20.19** | untuk Vite 8 (build asset Tailwind/Alpine) |
+| MySQL | 8.x / MariaDB 10.11+ | default; bisa diganti DB lain yang didukung Laravel |
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+---
 
-## Security Vulnerabilities
+## 🚀 Instalasi (dari Clone sampai Jalan)
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+### 1. Clone repository
 
-## License
+```bash
+git clone https://github.com/rendiwidyanggita/Festival-Inovasi.git
+cd Festival-Inovasi
+```
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+### 2. Instal dependensi
+
+```bash
+composer install
+npm install
+```
+
+### 3. Konfigurasi environment
+
+```bash
+cp .env.example .env
+php artisan key:generate
+```
+
+Lalu edit `.env` — bagian yang **wajib** disesuaikan:
+
+```dotenv
+# Database (MySQL)
+DB_CONNECTION=mysql
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_DATABASE=festival_inovasi       # buat dulu: CREATE DATABASE festival_inovasi;
+DB_USERNAME=root                   # ganti sesuai user MySQL Anda
+DB_PASSWORD=
+
+# URL aplikasi
+APP_URL=http://localhost:8000
+
+# Kredensial superadmin awal — WAJIB diisi sebelum seeding
+SUPERADMIN_NAME="Super Admin"
+SUPERADMIN_EMAIL="admin@festival-inovasi.local"
+SUPERADMIN_PASSWORD="admin123"     # gunakan password kuat untuk produksi!
+
+# Opsional: tahun festival yang dibuat seeder (default: tahun berjalan)
+#FESTIVAL_YEAR=2026
+
+# Opsional: nama penyelenggara pada pengaturan festival
+#ORGANIZER_NAME="Panitia Festival Inovasi"
+```
+
+> ⚠️ Kredensial superadmin diambil oleh `SuperadminSeeder` saat `db:seed`. Nilai asli jangan pernah di-commit.
+
+### 4. Migrasi & seed database
+
+```bash
+php artisan migrate --seed
+```
+
+Seeder yang berjalan: superadmin awal, festival (tahun berjalan), kategori & 13 subkategori, serta 4 kriteria penilaian per tipe sesuai PRD (bobot total 100%).
+
+### 5. (Opsional, untuk demo) Data contoh lengkap
+
+```bash
+php artisan db:seed --class=DemoSeeder
+```
+
+Mengisi: **5 akun juri**, instansi & inovasi di tiap subkategori, partisipasi juri, dan **2 subkategori dengan status penilaian terbuka** yang sudah berisi nilai contoh.
+
+### 6. Build frontend & jalankan
+
+```bash
+npm run build          # sekali (produksi / tanpa hot-reload)
+php artisan serve      # server: http://localhost:8000
+```
+
+Atau untuk pengembangan (build otomatis saat file berubah):
+
+```bash
+npm run dev            # Vite dev server
+php artisan serve      # di terminal lain
+```
+
+Buka **http://localhost:8000** 🎉
+
+---
+
+## 🔑 Akun Login
+
+| Role | Email | Password |
+|------|-------|----------|
+| Superadmin | `admin@festival-inovasi.local` | `admin123` *(dari `SUPERADMIN_*` di .env)* |
+| Juri 1 – Juri 5 *(khusus DemoSeeder)* | `juri1@festivalinovasi.test` … `juri5@festivalinovasi.test` | `password` |
+
+---
+
+## 🧪 Menjalankan Test
+
+```bash
+composer test          # atau: php artisan test
+```
+
+Suite mencakup: skema database, autentikasi & role, akses publik, alur scoring (draft → submit → kunci → revisi), laporan/PDF, dan smoke test end-to-end.
+
+---
+
+## 🗂️ Struktur Penting
+
+```
+app/
+├── Enums/            # UserRole, FestivalStatus, ScoringStatus, AssessmentStatus, ...
+├── Http/Controllers/ # Admin/, Jury/, Auth/, PublicController
+├── Models/           # Festival, AwardCategory, InnovationAssessment, ...
+├── Policies/         # Otorisasi (roster terkunci, hapus master data, dll.)
+└── Services/         # ScoringService, RankingService, WinnerService, ReportService, AuditService
+database/seeders/     # Superadmin, Festival, Category, AssessmentCriterion, Demo
+routes/web.php        # Semua route (publik, admin, juri)
+resources/views/      # Blade + Tailwind 4 + Alpine
+```
+
+Dokumen bisnis (PRD, ERD, aturan bisnis) tersedia di [`festival_inovasi_ai_docs/`](./festival_inovasi_ai_docs/).
+
+---
+
+## 🛠️ Troubleshooting
+
+| Masalah | Solusi |
+|---|---|
+| `Unable to locate file in Vite manifest` | Jalankan `npm run build` (atau `npm run dev` saat pengembangan) |
+| Seeder gagal: `SUPERADMIN_EMAIL ... harus diisi` | Isi `SUPERADMIN_*` di `.env` sebelum `db:seed` |
+| Gagal koneksi DB | Pastikan MySQL berjalan, database sudah dibuat, kredensial `.env` benar |
+| Halaman admin redirect "pilih festival" | Belum ada festival — buat di menu **Festival**, atau jalankan seeder |
+| Error 429 saat login | Rate limit 5 percobaan/menit — tunggu sebentar |
+| PDF kosong/gagal | Pastikan ekstensi PHP `dom`, `xml`, `gd` terpasang |
+
+---
+
+## 🔒 Catatan Keamanan (Produksi)
+
+- Set `APP_DEBUG=false` dan gunakan `APP_ENV=production`.
+- Selalu gunakan HTTPS; set `SESSION_SECURE_COOKIE=true`.
+- Ganti kredensial default superadmin & MySQL.
+- Hapus/komentari kredensial demo sebelum deploy.
+
+---
+
+## 📄 Lisensi
+
+Aplikasi ini open-sourced di bawah lisensi [MIT](https://opensource.org/licenses/MIT).
